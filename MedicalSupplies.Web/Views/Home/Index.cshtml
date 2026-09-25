@@ -1,0 +1,36 @@
+@model List<CatalogueProductCardViewModel>
+@{
+    ViewData["Title"] = "Home";
+}
+
+<div class="p-5 mb-4 bg-light rounded-3">
+    <h1>Reliable Medical Supplies &amp; Equipment for Healthcare Professionals</h1>
+    <a class="btn btn-primary" asp-controller="Products" asp-action="Index">View Products</a>
+    <a class="btn btn-outline-primary" asp-controller="Quotation" asp-action="Cart">Request a Quote</a>
+</div>
+
+<h2>Featured Products</h2>
+<div class="row row-cols-1 row-cols-md-3 g-4">
+    @foreach (var product in Model)
+    {
+        <div class="col">
+            <div class="card h-100">
+                <a asp-controller="Products" asp-action="Details" asp-route-id="@product.ProductId">
+                    <img src="@(product.PrimaryImageUrl ?? "/images/placeholder-product.svg")"
+                         class="card-img-top" style="height:160px; object-fit:cover;" alt="@product.ProductName" />
+                </a>
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <a asp-controller="Products" asp-action="Details" asp-route-id="@product.ProductId" class="text-decoration-none text-dark">@product.ProductName</a>
+                    </h5>
+                    <p class="card-text">@product.CategoryName @(product.BrandName is not null ? $"· {product.BrandName}" : "")</p>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@if (!Model.Any())
+{
+    <p class="text-muted">No products published yet — add some from the admin dashboard.</p>
+}

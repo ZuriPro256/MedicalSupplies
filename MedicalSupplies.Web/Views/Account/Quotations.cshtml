@@ -1,0 +1,25 @@
+@model List<MyQuotationListItemViewModel>
+@{ ViewData["Title"] = "My Quotations"; }
+
+<h1 class="mb-3">My Quotations</h1>
+
+<table class="table bg-white align-middle">
+    <thead><tr><th>Quote</th><th>Date</th><th>Amount</th><th>Status</th><th></th></tr></thead>
+    <tbody>
+    @foreach (var q in Model)
+    {
+        <tr>
+            <td>@q.QuotationNumber</td>
+            <td>@q.RequestDate.ToLocalTime().ToString("dd MMM yyyy")</td>
+            <td>@(q.TotalAmount is null ? "—" : $"UGX {q.TotalAmount:N0}")</td>
+            <td><span class="badge bg-secondary">@q.Status</span></td>
+            <td><a class="btn btn-sm btn-outline-secondary" asp-action="QuotationDetails" asp-route-id="@q.QuotationId">View</a></td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+@if (!Model.Any())
+{
+    <p class="text-muted">No quotations yet — <a asp-controller="Products" asp-action="Index">browse products</a> to request one.</p>
+}

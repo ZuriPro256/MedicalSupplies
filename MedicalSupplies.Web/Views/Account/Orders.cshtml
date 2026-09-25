@@ -1,0 +1,50 @@
+@model List<MyOrderListItemViewModel>
+@using MedicalSupplies.Core.Enums
+@{
+    ViewData["Title"] = "My Orders";
+
+    // Created isn't shown as a step — from the customer's point of view
+    // the journey starts once we're actually working on it.
+    var steps = new[] { OrderStatus.Processing, OrderStatus.Dispatched, OrderStatus.Delivered };
+    int ReachedIndex(OrderStatus status) => Array.IndexOf(steps, status);
+}
+
+<h1 class="mb-3">My Orders</h1>
+
+@foreach (var order in Model)
+{
+    <div class="card mb-3 p-3">
+        <div class="d-flex justify-content-between">
+            <div>
+                <h5><a asp-action="OrderDetails" asp-route-id="@order.OrderId">@order.OrderNumber</a></h5>
+                <p class="text-muted mb-1">@order.OrderDate.ToLocalTime().ToString("dd MMMM yyyy")</p>
+                <p class="mb-1">UGX @order.TotalAmount.ToString("N0")</p>
+            </div>
+            <div class="text-end">
+                @if (order.OrderStatus == OrderStatus.Cancelled)
+                {
+                    <span class="badge bg-danger">Cancelled</span>
+                }
+                else
+                {
+                    var reached = ReachedIndex(order.OrderStatus);
+                    <ul class="list-unstyled mb-0">
+                        @for (var i = 0; i < steps.Length; i++)
+                        {
+                            <li>@(i <= reached ? "●" : "○") @steps[i]</li>
+                        }
+                    </ul>
+                    @if (order.DeliveredDate is not null)
+                    {
+                        <p class="text-muted small mb-0">Delivered: @order.DeliveredDate.Value.ToLocalTime().ToString("dd MMMM yyyy")</p>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+}
+
+@if (!Model.Any())
+{
+    <p class="text-muted">No orders yet.</p>
+}

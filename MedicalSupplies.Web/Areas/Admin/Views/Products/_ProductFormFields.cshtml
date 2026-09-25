@@ -1,0 +1,84 @@
+@model ProductFormViewModel
+
+<div class="row">
+    <div class="col-md-6 mb-3">
+        <label asp-for="ProductCode" class="form-label"></label>
+        <input asp-for="ProductCode" class="form-control" />
+        <span asp-validation-for="ProductCode" class="text-danger"></span>
+    </div>
+    <div class="col-md-6 mb-3">
+        <label asp-for="ProductName" class="form-label"></label>
+        <input asp-for="ProductName" class="form-control" />
+        <span asp-validation-for="ProductName" class="text-danger"></span>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-3">
+        <label asp-for="CategoryId" class="form-label"></label>
+        <select asp-for="CategoryId" class="form-select">
+            <option value="">-- Select --</option>
+            @foreach (var opt in Model.CategoryOptions)
+            {
+                <option value="@opt.Value">@opt.Text</option>
+            }
+        </select>
+        <span asp-validation-for="CategoryId" class="text-danger"></span>
+    </div>
+    <div class="col-md-6 mb-3">
+        <label asp-for="BrandId" class="form-label"></label>
+        <select asp-for="BrandId" class="form-select">
+            <option value="">-- None --</option>
+            @foreach (var opt in Model.BrandOptions)
+            {
+                <option value="@opt.Value">@opt.Text</option>
+            }
+        </select>
+    </div>
+</div>
+
+<div class="mb-3">
+    <label asp-for="Description" class="form-label"></label>
+    <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+</div>
+
+<div class="mb-3">
+    <label asp-for="Specifications" class="form-label"></label>
+    <textarea asp-for="Specifications" class="form-control" rows="3" placeholder="One spec per line, e.g. Result time: 5 seconds"></textarea>
+</div>
+
+<div class="row">
+    <div class="col-md-4 mb-3">
+        <label asp-for="UnitOfMeasure" class="form-label"></label>
+        <input asp-for="UnitOfMeasure" class="form-control" placeholder="e.g. Box, Piece" />
+    </div>
+    <div class="col-md-4 mb-3">
+        <label asp-for="PackSize" class="form-label"></label>
+        <input asp-for="PackSize" class="form-control" placeholder="e.g. 50 strips/box" />
+    </div>
+    <div class="col-md-4 mb-3">
+        <label asp-for="SellingPrice" class="form-label"></label>
+        <input asp-for="SellingPrice" class="form-control" placeholder="Leave blank for &quot;Request a Quote&quot;" />
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4 mb-3">
+        <label asp-for="ReorderLevel" class="form-label"></label>
+        <input asp-for="ReorderLevel" class="form-control" />
+    </div>
+    <div class="col-md-4 mb-3 form-check pt-4">
+        <input asp-for="RequiresBatchTracking" class="form-check-input" />
+        <label asp-for="RequiresBatchTracking" class="form-check-label"></label>
+    </div>
+    <div class="col-md-4 mb-3 form-check pt-4">
+        <input asp-for="IsActive" class="form-check-input" />
+        <label asp-for="IsActive" class="form-check-label"></label>
+    </div>
+</div>
+
+<div class="mb-3">
+    <label asp-for="NewImages" class="form-label">Product Images</label>
+    <input type="file" name="NewImages" multiple accept="image/*" class="form-control" />
+    <div class="form-text">First image uploaded (if none exist yet) becomes the primary image.</div>
+</div>

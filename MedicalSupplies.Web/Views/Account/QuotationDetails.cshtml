@@ -1,0 +1,42 @@
+@model MyQuotationDetailsViewModel
+@{ ViewData["Title"] = $"Quotation {Model.QuotationNumber}"; }
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1>Quotation @Model.QuotationNumber</h1>
+    <span class="badge bg-secondary fs-6">@Model.Status</span>
+</div>
+
+<p class="text-muted">Requested @Model.RequestDate.ToLocalTime().ToString("dd MMM yyyy")</p>
+@if (Model.ValidUntil is not null) { <p class="text-muted">Valid until @Model.ValidUntil</p> }
+
+<table class="table bg-white">
+    <thead><tr><th>Product</th><th>Qty</th><th>Unit Price</th><th>Total</th></tr></thead>
+    <tbody>
+    @foreach (var line in Model.Lines)
+    {
+        <tr>
+            <td>@line.ProductName</td>
+            <td>@line.Quantity</td>
+            <td>@(line.UnitPrice is null ? "—" : $"UGX {line.UnitPrice:N0}")</td>
+            <td>@(line.LineTotal is null ? "—" : $"UGX {line.LineTotal:N0}")</td>
+        </tr>
+    }
+    </tbody>
+    <tfoot>
+        <tr><td colspan="3" class="text-end">Subtotal</td><td>UGX @Model.SubTotal.ToString("N0")</td></tr>
+        @if (Model.DiscountAmount is not null)
+        {
+            <tr><td colspan="3" class="text-end">Discount</td><td>UGX @Model.DiscountAmount.Value.ToString("N0")</td></tr>
+        }
+        <tr class="fw-bold"><td colspan="3" class="text-end">Total</td><td>@(Model.TotalAmount is null ? "—" : $"UGX {Model.TotalAmount:N0}")</td></tr>
+    </tfoot>
+</table>
+
+@if (Model.OrderId is not null)
+{
+    <p>This quotation became order
+        <a asp-action="OrderDetails" asp-route-id="@Model.OrderId">@Model.OrderNumber</a>.
+    </p>
+}
+
+<a asp-action="Quotations" class="btn btn-link">&larr; Back to My Quotations</a>

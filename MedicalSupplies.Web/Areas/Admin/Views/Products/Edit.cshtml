@@ -1,0 +1,48 @@
+@model ProductFormViewModel
+@{ ViewData["Title"] = "Edit Product"; }
+
+<h1>Edit Product</h1>
+
+<form asp-action="Edit" asp-route-id="@Model.ProductId" method="post" enctype="multipart/form-data" class="col-md-8">
+    <input type="hidden" asp-for="ProductId" />
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <partial name="_ProductFormFields" />
+
+    @if (Model.ExistingImages.Any())
+    {
+        <h5 class="mt-4">Existing Images</h5>
+        <div class="row g-3 mb-3">
+            @foreach (var image in Model.ExistingImages)
+            {
+                <div class="col-3">
+                    <div class="card">
+                        <img src="@image.ImageUrl" class="card-img-top" style="height:100px; object-fit:cover;" />
+                        <div class="card-body p-2 text-center">
+                            @if (image.IsPrimary)
+                            {
+                                <span class="badge bg-primary">Primary</span>
+                            }
+                            else
+                            {
+                                <form asp-action="SetPrimaryImage" method="post" class="d-inline">
+                                    <input type="hidden" name="productImageId" value="@image.ProductImageId" />
+                                    <input type="hidden" name="productId" value="@Model.ProductId" />
+                                    <button type="submit" class="btn btn-sm btn-link p-0">Make primary</button>
+                                </form>
+                            }
+                            <form asp-action="DeleteImage" method="post" class="d-inline"
+                                  onsubmit="return confirm('Remove this image?');">
+                                <input type="hidden" name="productImageId" value="@image.ProductImageId" />
+                                <input type="hidden" name="productId" value="@Model.ProductId" />
+                                <button type="submit" class="btn btn-sm btn-link text-danger p-0">Remove</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+</form>

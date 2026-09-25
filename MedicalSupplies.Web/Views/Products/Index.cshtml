@@ -1,0 +1,59 @@
+@model CatalogueListViewModel
+@{ ViewData["Title"] = "Products"; }
+
+<h1 class="mb-4">Medical Supplies &amp; Equipment</h1>
+
+<form method="get" class="row g-2 mb-4">
+    <div class="col-md-5">
+        <input type="text" name="q" value="@Model.SearchTerm" class="form-control" placeholder="Search products, e.g. glucometer" />
+    </div>
+    <div class="col-md-3">
+        <select name="categoryId" class="form-select" asp-items="@(Model.CategoryOptions.Select(o => new SelectListItem(o.Text, o.Value.ToString())))">
+            <option value="">All Categories</option>
+        </select>
+    </div>
+    <div class="col-md-3">
+        <select name="brandId" class="form-select" asp-items="@(Model.BrandOptions.Select(o => new SelectListItem(o.Text, o.Value.ToString())))">
+            <option value="">All Brands</option>
+        </select>
+    </div>
+    <div class="col-md-1">
+        <button type="submit" class="btn btn-primary w-100">Go</button>
+    </div>
+</form>
+
+<p class="text-muted">@Model.TotalResults product(s) found</p>
+
+<div class="row row-cols-1 row-cols-md-4 g-4">
+    @foreach (var product in Model.Products)
+    {
+        <div class="col">
+            <div class="card h-100">
+                <a asp-action="Details" asp-route-id="@product.ProductId">
+                    <img src="@(product.PrimaryImageUrl ?? "/images/placeholder-product.svg")"
+                         class="card-img-top" style="height:160px; object-fit:cover;" alt="@product.ProductName" />
+                </a>
+                <div class="card-body">
+                    <h6 class="card-title">
+                        <a asp-action="Details" asp-route-id="@product.ProductId" class="text-decoration-none text-dark">@product.ProductName</a>
+                    </h6>
+                    <p class="card-text small text-muted mb-1">@product.CategoryName @(product.BrandName is not null ? $"· {product.BrandName}" : "")</p>
+                    <p class="card-text small">@product.PackSize</p>
+                    @if (product.InStock)
+                    {
+                        <span class="badge bg-success">In Stock</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">Check Availability</span>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@if (!Model.Products.Any())
+{
+    <p class="text-muted mt-4">No products matched your search. Try a different term, or <a asp-controller="Home" asp-action="Index">contact us</a> with your requirements.</p>
+}

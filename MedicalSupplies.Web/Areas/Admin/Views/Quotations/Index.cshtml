@@ -1,0 +1,38 @@
+@model List<QuotationListItemViewModel>
+@{ ViewData["Title"] = "Quotations"; }
+
+<h1 class="mb-3">Quotations</h1>
+
+<div class="btn-group mb-3" role="group">
+    <a class="btn btn-sm @(ViewBag.SelectedStatus == null ? "btn-primary" : "btn-outline-primary")" asp-action="Index">All</a>
+    @foreach (var status in Enum.GetValues<MedicalSupplies.Core.Enums.QuotationStatus>())
+    {
+        <a class="btn btn-sm @(Equals(ViewBag.SelectedStatus, status) ? "btn-primary" : "btn-outline-primary")"
+           asp-action="Index" asp-route-status="@status">@status</a>
+    }
+</div>
+
+<table class="table table-striped bg-white align-middle">
+    <thead>
+        <tr><th>Number</th><th>Customer</th><th>Requested</th><th>Items</th><th>Total</th><th>Status</th><th></th></tr>
+    </thead>
+    <tbody>
+    @foreach (var q in Model)
+    {
+        <tr>
+            <td>@q.QuotationNumber</td>
+            <td>@q.CustomerName</td>
+            <td>@q.RequestDate.ToLocalTime().ToString("dd MMM yyyy")</td>
+            <td>@q.LineCount</td>
+            <td>@(q.TotalAmount is null ? "—" : $"UGX {q.TotalAmount:N0}")</td>
+            <td><span class="badge bg-secondary">@q.Status</span></td>
+            <td><a class="btn btn-sm btn-outline-secondary" asp-action="Details" asp-route-id="@q.QuotationId">Open</a></td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+@if (!Model.Any())
+{
+    <p class="text-muted">No quotations in this view.</p>
+}

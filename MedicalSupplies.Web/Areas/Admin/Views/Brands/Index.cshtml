@@ -1,0 +1,30 @@
+@model List<Brand>
+@{ ViewData["Title"] = "Brands"; }
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1>Brands</h1>
+    <a class="btn btn-primary" asp-action="Create">+ Add Brand</a>
+</div>
+
+<table class="table table-striped bg-white">
+    <thead>
+        <tr><th>Name</th><th>Country</th><th>Active</th><th></th></tr>
+    </thead>
+    <tbody>
+    @foreach (var brand in Model)
+    {
+        <tr>
+            <td>@brand.BrandName</td>
+            <td>@brand.Country</td>
+            <td>@(brand.IsActive ? "Yes" : "No")</td>
+            <td>
+                <a class="btn btn-sm btn-outline-secondary" asp-action="Edit" asp-route-id="@brand.BrandId">Edit</a>
+                <form asp-action="Delete" asp-route-id="@brand.BrandId" method="post" class="d-inline"
+                      onsubmit="return confirm('Delete this brand?');">
+                    <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                </form>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

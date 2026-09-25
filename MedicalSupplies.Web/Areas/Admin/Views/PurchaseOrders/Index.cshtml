@@ -1,0 +1,40 @@
+@model List<PurchaseOrderListItemViewModel>
+@{ ViewData["Title"] = "Purchase Orders"; }
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1>Purchase Orders</h1>
+    <a class="btn btn-primary" asp-action="Create">+ New Purchase Order</a>
+</div>
+
+<div class="btn-group mb-3" role="group">
+    <a class="btn btn-sm @(ViewBag.SelectedStatus == null ? "btn-primary" : "btn-outline-primary")" asp-action="Index">All</a>
+    @foreach (var status in Enum.GetValues<MedicalSupplies.Core.Enums.PurchaseOrderStatus>())
+    {
+        <a class="btn btn-sm @(Equals(ViewBag.SelectedStatus, status) ? "btn-primary" : "btn-outline-primary")"
+           asp-action="Index" asp-route-status="@status">@status</a>
+    }
+</div>
+
+<table class="table table-striped bg-white align-middle">
+    <thead>
+        <tr><th>PO Number</th><th>Supplier</th><th>Date</th><th>Total</th><th>Status</th><th></th></tr>
+    </thead>
+    <tbody>
+    @foreach (var po in Model)
+    {
+        <tr>
+            <td>@po.PurchaseOrderNumber</td>
+            <td>@po.SupplierName</td>
+            <td>@po.OrderDate.ToLocalTime().ToString("dd MMM yyyy")</td>
+            <td>@po.Currency @po.TotalAmount.ToString("N0")</td>
+            <td><span class="badge bg-secondary">@po.Status</span></td>
+            <td><a class="btn btn-sm btn-outline-secondary" asp-action="Details" asp-route-id="@po.PurchaseOrderId">View</a></td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+@if (!Model.Any())
+{
+    <p class="text-muted">No purchase orders in this view.</p>
+}

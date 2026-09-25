@@ -1,0 +1,11 @@
+@model PurchaseOrderFormViewModel
+@{ ViewData["Title"] = "New Purchase Order"; }
+
+<h1>New Purchase Order</h1>
+
+<form asp-action="Create" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <partial name="_FormFields" />
+    <button type="submit" class="btn btn-primary">Save as Draft</button>
+    <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+</form>

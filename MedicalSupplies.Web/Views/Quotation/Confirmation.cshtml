@@ -1,0 +1,8 @@
+@{ ViewData["Title"] = "Request Received"; }
+
+<div class="text-center py-5">
+    <h1>Thank you</h1>
+    <p class="lead">Your quotation request <strong>@ViewBag.QuotationNumber</strong> has been received.</p>
+    <p>Our team will review it and get back to you with pricing and availability.</p>
+    <a asp-controller="Products" asp-action="Index" class="btn btn-primary">Continue Browsing</a>
+</div>

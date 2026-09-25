@@ -1,0 +1,44 @@
+@model AccountDashboardViewModel
+@{ ViewData["Title"] = "My Account"; }
+
+<h1>My Account</h1>
+<p class="text-muted">@Model.DisplayName</p>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card text-center p-3">
+            <div class="fs-2">@Model.QuotationCount</div>
+            <div class="text-muted">Quotations</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center p-3">
+            <div class="fs-2">@Model.OrderCount</div>
+            <div class="text-muted">Orders</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center p-3">
+            <div class="fs-2">@Model.PendingQuotationCount</div>
+            <div class="text-muted">Pending</div>
+        </div>
+    </div>
+</div>
+
+<h4>Recent Orders</h4>
+@if (Model.RecentOrders.Any())
+{
+    <ul class="list-group">
+        @foreach (var order in Model.RecentOrders)
+        {
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <a asp-action="OrderDetails" asp-route-id="@order.OrderId">@order.OrderNumber</a>
+                <span class="badge bg-secondary">@order.OrderStatus</span>
+            </li>
+        }
+    </ul>
+}
+else
+{
+    <p class="text-muted">No orders yet.</p>
+}

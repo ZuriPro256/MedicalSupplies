@@ -1,0 +1,80 @@
+@model ReceiveLineViewModel
+@{ ViewData["Title"] = "Receive Goods"; }
+
+<h1>Receive Goods</h1>
+<p class="text-muted">@Model.PurchaseOrderNumber — @Model.SupplierName</p>
+
+<div class="mb-3">
+    <strong>Product:</strong> @Model.ProductName<br />
+    <strong>Ordered:</strong> @Model.Quantity &nbsp;
+    <strong>Already Received:</strong> @Model.QuantityReceived &nbsp;
+    <strong>Remaining:</strong> <span id="remainingLabel">@Model.QuantityRemaining</span>
+</div>
+
+<form asp-action="ReceiveLine" asp-route-id="@Model.PurchaseOrderDetailId" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input type="hidden" id="remainingValue" value="@Model.QuantityRemaining" />
+
+    <table class="table" id="batchTable">
+        <thead><tr><th>Batch Number</th><th>Expiry Date</th><th style="width:140px;">Quantity</th><th></th></tr></thead>
+        <tbody>
+        @for (var i = 0; i < Model.Batches.Count; i++)
+        {
+            <tr class="batch-row">
+                <td><input type="text" name="Batches[@i].BatchNumber" value="@Model.Batches[i].BatchNumber" class="form-control" /></td>
+                <td><input type="date" name="Batches[@i].ExpiryDate" value="@Model.Batches[i].ExpiryDate" class="form-control" /></td>
+                <td><input type="number" name="Batches[@i].Quantity" value="@Model.Batches[i].Quantity" min="0" class="form-control batch-qty" /></td>
+                <td><button type="button" class="btn btn-sm btn-outline-danger remove-batch-row">&times;</button></td>
+            </tr>
+        }
+        </tbody>
+    </table>
+    <button type="button" id="addBatchRow" class="btn btn-sm btn-outline-secondary mb-3">+ Add Batch</button>
+
+    <p>Total entered: <span id="totalEntered">0</span> / <span id="remainingLabel2">@Model.QuantityRemaining</span></p>
+
+    <button type="submit" class="btn btn-primary">Receive Goods</button>
+    <a asp-action="Details" asp-route-id="@Model.PurchaseOrderId" class="btn btn-outline-secondary">Cancel</a>
+</form>
+
+@section Scripts {
+<script>
+    var rowIndex = @Model.Batches.Count;
+    var remaining = parseFloat(document.getElementById('remainingValue').value) || 0;
+
+    document.getElementById('addBatchRow').addEventListener('click', function () {
+        var tbody = document.querySelector('#batchTable tbody');
+        var row = document.createElement('tr');
+        row.className = 'batch-row';
+        row.innerHTML =
+            '<td><input type="text" name="Batches[' + rowIndex + '].BatchNumber" class="form-control" /></td>' +
+            '<td><input type="date" name="Batches[' + rowIndex + '].ExpiryDate" class="form-control" /></td>' +
+            '<td><input type="number" name="Batches[' + rowIndex + '].Quantity" value="0" min="0" class="form-control batch-qty" /></td>' +
+            '<td><button type="button" class="btn btn-sm btn-outline-danger remove-batch-row">&times;</button></td>';
+        tbody.appendChild(row);
+        rowIndex++;
+        attachRowEvents(row);
+        recalcBatches();
+    });
+
+    function attachRowEvents(row) {
+        row.querySelector('.batch-qty').addEventListener('input', recalcBatches);
+        row.querySelector('.remove-batch-row').addEventListener('click', function () {
+            row.remove();
+            recalcBatches();
+        });
+    }
+    document.querySelectorAll('.batch-row').forEach(attachRowEvents);
+
+    function recalcBatches() {
+        var total = 0;
+        document.querySelectorAll('.batch-qty').forEach(function (input) {
+            total += parseFloat(input.value) || 0;
+        });
+        var label = document.getElementById('totalEntered');
+        label.textContent = total;
+        label.className = total > remaining || total <= 0 ? 'text-danger fw-bold' : 'text-success fw-bold';
+    }
+    recalcBatches();
+</script>
+}

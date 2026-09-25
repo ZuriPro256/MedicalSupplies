@@ -1,0 +1,67 @@
+@model QuotationRequestFormViewModel
+@{ ViewData["Title"] = "Request a Quotation"; }
+
+<h1>Request a Quotation</h1>
+
+<div class="row">
+    <div class="col-md-5">
+        <h5>Items</h5>
+        <ul class="list-group mb-4">
+            @foreach (var line in Model.Lines)
+            {
+                <li class="list-group-item d-flex justify-content-between">
+                    <span>@line.ProductName</span>
+                    <span class="text-muted">x@(line.Quantity)</span>
+                </li>
+            }
+        </ul>
+        <a asp-action="Cart" class="btn btn-sm btn-outline-secondary">&larr; Edit list</a>
+    </div>
+
+    <div class="col-md-7">
+        <form asp-action="Request" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="mb-3">
+                <label asp-for="ContactName" class="form-label"></label>
+                <input asp-for="ContactName" class="form-control" />
+                <span asp-validation-for="ContactName" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="OrganizationName" class="form-label">Organization (if applicable)</label>
+                <input asp-for="OrganizationName" class="form-control" />
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Email" class="form-label"></label>
+                    <input asp-for="Email" class="form-control" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Phone" class="form-label"></label>
+                    <input asp-for="Phone" class="form-control" />
+                    <span asp-validation-for="Phone" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="DeliveryLocation" class="form-label"></label>
+                <input asp-for="DeliveryLocation" class="form-control" />
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="CustomerNotes" class="form-label">Notes (optional)</label>
+                <textarea asp-for="CustomerNotes" class="form-control" rows="3"></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Submit Quotation Request</button>
+        </form>
+
+        <p class="text-muted mt-3">
+            Prefer WhatsApp? Send your product list to
+            <a href="https://wa.me/256000000000" target="_blank">our WhatsApp line</a> instead.
+        </p>
+    </div>
+</div>

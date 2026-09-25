@@ -1,0 +1,69 @@
+@model List<OrderListItemViewModel>
+@{
+    ViewData["Title"] = "Orders";
+    var filter = (OrderFilterViewModel)ViewBag.Filter;
+}
+
+<h1 class="mb-3">Orders</h1>
+
+<form method="get" class="row g-2 mb-4">
+    <div class="col-md-2">
+        <input type="text" name="OrderNumber" value="@filter.OrderNumber" class="form-control" placeholder="Order #" />
+    </div>
+    <div class="col-md-2">
+        <input type="text" name="Customer" value="@filter.Customer" class="form-control" placeholder="Customer" />
+    </div>
+    <div class="col-md-2">
+        <select name="Status" class="form-select">
+            <option value="">Any Status</option>
+            @foreach (var status in Enum.GetValues<MedicalSupplies.Core.Enums.OrderStatus>())
+            {
+                <option value="@status" selected="@(filter.Status == status)">@status</option>
+            }
+        </select>
+    </div>
+    <div class="col-md-2">
+        <select name="PaymentStatus" class="form-select">
+            <option value="">Any Payment</option>
+            @foreach (var status in Enum.GetValues<MedicalSupplies.Core.Enums.PaymentStatus>())
+            {
+                <option value="@status" selected="@(filter.PaymentStatus == status)">@status</option>
+            }
+        </select>
+    </div>
+    <div class="col-md-2">
+        <input type="date" name="FromDate" value="@filter.FromDate" class="form-control" />
+    </div>
+    <div class="col-md-2">
+        <input type="date" name="ToDate" value="@filter.ToDate" class="form-control" />
+    </div>
+    <div class="col-12">
+        <button type="submit" class="btn btn-primary btn-sm">Filter</button>
+        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Clear</a>
+    </div>
+</form>
+
+<table class="table table-striped bg-white align-middle">
+    <thead>
+        <tr><th>Order No.</th><th>Customer</th><th>Date</th><th>Total</th><th>Payment</th><th>Status</th><th></th></tr>
+    </thead>
+    <tbody>
+    @foreach (var o in Model)
+    {
+        <tr>
+            <td>@o.OrderNumber</td>
+            <td>@o.CustomerName</td>
+            <td>@o.OrderDate.ToLocalTime().ToString("dd MMM")</td>
+            <td>UGX @o.TotalAmount.ToString("N0")</td>
+            <td><span class="badge bg-light text-dark">@o.PaymentStatus</span></td>
+            <td><span class="badge bg-secondary">@o.OrderStatus</span></td>
+            <td><a class="btn btn-sm btn-outline-secondary" asp-action="Details" asp-route-id="@o.OrderId">View</a></td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+@if (!Model.Any())
+{
+    <p class="text-muted">No orders match this filter.</p>
+}

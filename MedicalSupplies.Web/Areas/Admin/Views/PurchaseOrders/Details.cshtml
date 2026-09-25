@@ -1,0 +1,100 @@
+@model PurchaseOrderDetailsViewModel
+@{ ViewData["Title"] = $"PO {Model.PurchaseOrderNumber}"; }
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1>Purchase Order @Model.PurchaseOrderNumber</h1>
+    <span class="badge bg-secondary fs-6">@Model.Status</span>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <p><strong>Supplier:</strong> @Model.SupplierName @(Model.SupplierContact is not null ? $"({Model.SupplierContact})" : "")</p>
+        <p class="text-muted">Ordered @Model.OrderDate.ToLocalTime().ToString("dd MMM yyyy")
+            @(Model.ExpectedDeliveryDate is not null ? $"· expected {Model.ExpectedDeliveryDate}" : "")</p>
+        @if (Model.Notes is not null) { <p><strong>Notes:</strong> @Model.Notes</p> }
+        <p class="text-muted small">
+            Created by @(Model.CreatedBy ?? "—")
+            @if (Model.ApprovedBy is not null)
+            {
+                <text>· Approved by @Model.ApprovedBy on @Model.ApprovedDate!.Value.ToLocalTime().ToString("dd MMM yyyy")</text>
+            }
+        </p>
+    </div>
+</div>
+
+<table class="table bg-white align-middle">
+    <thead><tr><th>Product</th><th>Ordered</th><th>Unit Cost</th><th>Total</th><th>Received</th><th>Remaining</th><th></th></tr></thead>
+    <tbody>
+    @foreach (var line in Model.Lines)
+    {
+        <tr>
+            <td>@line.ProductName</td>
+            <td>@line.Quantity</td>
+            <td>@Model.Currency @line.UnitCost.ToString("N0")</td>
+            <td>@Model.Currency @line.TotalCost.ToString("N0")</td>
+            <td>@line.QuantityReceived</td>
+            <td>@line.QuantityRemaining</td>
+            <td>
+                @if (Model.CanReceive && line.QuantityRemaining > 0)
+                {
+                    <a class="btn btn-sm btn-primary" asp-action="ReceiveLine" asp-route-id="@line.PurchaseOrderDetailId">Receive</a>
+                }
+            </td>
+        </tr>
+    }
+    </tbody>
+    <tfoot>
+        <tr><td colspan="3" class="text-end">Subtotal</td><td colspan="3">@Model.Currency @Model.Subtotal.ToString("N0")</td></tr>
+        @if (Model.DeliveryCost is not null)
+        {
+            <tr><td colspan="3" class="text-end">Delivery</td><td colspan="3">@Model.Currency @Model.DeliveryCost.Value.ToString("N0")</td></tr>
+        }
+        @if (Model.TaxAmount is not null)
+        {
+            <tr><td colspan="3" class="text-end">Tax</td><td colspan="3">@Model.Currency @Model.TaxAmount.Value.ToString("N0")</td></tr>
+        }
+        <tr class="fw-bold"><td colspan="3" class="text-end">TOTAL</td><td colspan="3">@Model.Currency @Model.TotalAmount.ToString("N0")</td></tr>
+    </tfoot>
+</table>
+
+<div class="row">
+    <div class="col-md-6">
+        <h5>Purchase Order Status</h5>
+        @if (Model.Status == MedicalSupplies.Core.Enums.PurchaseOrderStatus.Draft)
+        {
+            <a class="btn btn-sm btn-outline-secondary mb-2" asp-action="Edit" asp-route-id="@Model.PurchaseOrderId">Edit Lines</a>
+        }
+        @if (Model.AvailableNextStatuses.Any())
+        {
+            <form asp-action="ChangeStatus" asp-route-id="@Model.PurchaseOrderId" method="post" class="d-flex gap-2"
+                  onsubmit="return confirm('Change this purchase order\'s status?');">
+                <select name="newStatus" class="form-select form-select-sm">
+                    @foreach (var status in Model.AvailableNextStatuses)
+                    {
+                        <option value="@status">@status</option>
+                    }
+                </select>
+                <button type="submit" class="btn btn-sm btn-primary">Update</button>
+            </form>
+        }
+        else
+        {
+            <p class="text-muted small">No further status changes available.</p>
+        }
+    </div>
+    <div class="col-md-6">
+        <h5>Payment to Supplier</h5>
+        <p><span class="badge bg-light text-dark">@Model.PaymentStatus</span></p>
+        <form asp-action="UpdatePayment" asp-route-id="@Model.PurchaseOrderId" method="post" class="d-flex gap-2">
+            <select name="paymentStatus" class="form-select form-select-sm">
+                @foreach (var status in Enum.GetValues<MedicalSupplies.Core.Enums.PaymentStatus>())
+                {
+                    <option value="@status" selected="@(status == Model.PaymentStatus)">@status</option>
+                }
+            </select>
+            <button type="submit" class="btn btn-sm btn-outline-primary">Save</button>
+        </form>
+    </div>
+</div>
+
+<a asp-action="Index" class="btn btn-link mt-3">&larr; Back to Purchase Orders</a>
