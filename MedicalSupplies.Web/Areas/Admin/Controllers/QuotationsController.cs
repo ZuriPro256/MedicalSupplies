@@ -83,7 +83,15 @@ public class QuotationsController : Controller
 
         foreach (var line in vm.Lines)
         {
-            var detail = quotation.Details.First(d => d.QuotationDetailId == line.QuotationDetailId);
+            var detail = quotation.Details.FirstOrDefault(
+                d => d.QuotationDetailId == line.QuotationDetailId);
+
+            if (detail is null)
+            {
+                TempData["Error"] = "The quotation contains an invalid line item. Please reload the quotation and try again.";
+                return RedirectToAction(nameof(Details), new { id = vm.QuotationId });
+            }
+
             detail.UnitPrice = line.UnitPrice;
             detail.TotalPrice = (line.UnitPrice ?? 0) * detail.Quantity;
         }
