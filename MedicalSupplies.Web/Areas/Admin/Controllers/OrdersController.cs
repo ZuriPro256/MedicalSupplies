@@ -38,14 +38,14 @@ public class OrdersController : Controller
 
         if (!string.IsNullOrWhiteSpace(filter.OrderNumber))
         {
-            query = query.Where(o => o.OrderNumber.Contains(filter.OrderNumber));
+            query = query.Where(o => EF.Functions.ILike(o.OrderNumber, $"%{filter.OrderNumber}%"));
         }
         if (!string.IsNullOrWhiteSpace(filter.Customer))
         {
             query = query.Where(o =>
-                (o.Customer.OrganizationName != null && o.Customer.OrganizationName.Contains(filter.Customer)) ||
-                (o.Customer.FirstName != null && o.Customer.FirstName.Contains(filter.Customer)) ||
-                (o.Customer.LastName != null && o.Customer.LastName.Contains(filter.Customer)));
+                (o.Customer.OrganizationName != null && EF.Functions.ILike(o.Customer.OrganizationName, $"%{filter.Customer}%")) ||
+                (o.Customer.FirstName != null && EF.Functions.ILike(o.Customer.FirstName, $"%{filter.Customer}%")) ||
+                (o.Customer.LastName != null && EF.Functions.ILike(o.Customer.LastName, $"%{filter.Customer}%")));
         }
         if (filter.Status.HasValue)
         {

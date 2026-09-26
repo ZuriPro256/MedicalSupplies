@@ -22,7 +22,7 @@ public class SuppliersController : Controller
         if (!string.IsNullOrWhiteSpace(search))
         {
             query = query.Where(s =>
-                s.SupplierName.Contains(search) || s.SupplierCode.Contains(search));
+                EF.Functions.ILike(s.SupplierName, $"%{search}%") || EF.Functions.ILike(s.SupplierCode, $"%{search}%"));
         }
         if (isActive.HasValue)
         {
