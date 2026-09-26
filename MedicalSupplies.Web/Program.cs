@@ -4,15 +4,13 @@ using MedicalSupplies.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Data layer, Identity and repositories (see MedicalSupplies.Infrastructure/DependencyInjection.cs)
 builder.Services.AddInfrastructure(builder.Configuration);
-
 builder.Services.AddControllersWithViews();
 
-// Product image uploads (admin) and the "request a quote" session cart (public)
 builder.Services.AddScoped<IFileUploadService, FileUploadService>();
 builder.Services.AddScoped<IQuotationCartService, QuotationCartService>();
 builder.Services.AddScoped<IOrderFulfillmentService, OrderFulfillmentService>();
+
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
@@ -30,15 +28,11 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
-
 app.UseSession();
-
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Lets the admin dashboard live under /Admin/... via an ASP.NET Core Area
 app.MapControllerRoute(
     name: "areas",
     pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
@@ -47,7 +41,14 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-// Creates the SuperAdmin/Admin/Sales/InventoryManager/Customer roles on startup
+// Create the application roles on startup.
 await SeedData.SeedRolesAsync(app.Services);
+
+// One-time CLI setup for the first SuperAdmin account.
+if (args.Contains("--create-superadmin", StringComparer.OrdinalIgnoreCase))
+{
+    await AdminBootstrap.CreateAsync(app.Services);
+    return;
+}
 
 app.Run();

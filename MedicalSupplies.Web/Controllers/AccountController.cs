@@ -335,8 +335,24 @@ public class AccountController : Controller
         return await _context.Customers.FirstOrDefaultAsync(c => c.UserId == userId);
     }
 
-    private IActionResult RedirectToLocalOrDashboard(string? returnUrl) =>
-        !string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl)
-            ? Redirect(returnUrl)
-            : RedirectToAction(nameof(Dashboard));
+    private IActionResult RedirectToLocalOrDashboard(string? returnUrl)
+    {
+        if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+        {
+            return Redirect(returnUrl);
+        }
+
+        if (User.IsInRole("SuperAdmin") ||
+            User.IsInRole("Admin") ||
+            User.IsInRole("Sales") ||
+            User.IsInRole("InventoryManager"))
+        {
+            return RedirectToAction(
+                "Index",
+                "Dashboard",
+                new { area = "Admin" });
+        }
+
+        return RedirectToAction(nameof(Dashboard));
+    }
 }
