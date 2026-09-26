@@ -16,6 +16,14 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
         builder.Property(c => c.Phone).HasMaxLength(50);
         builder.Property(c => c.Address).HasMaxLength(300);
         builder.Property(c => c.City).HasMaxLength(100);
+
+        builder.HasIndex(c => c.UserId).IsUnique();
+
+        builder.HasOne<MedicalSupplies.Infrastructure.Identity.ApplicationUser>()
+            .WithOne()
+            .HasForeignKey<Customer>(c => c.UserId)
+            .HasPrincipalKey<MedicalSupplies.Infrastructure.Identity.ApplicationUser>(u => u.Id)
+            .OnDelete(DeleteBehavior.SetNull);
     }
 }
 
