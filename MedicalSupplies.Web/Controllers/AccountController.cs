@@ -113,7 +113,7 @@ public class AccountController : Controller
     {
         if (!ModelState.IsValid) return View(vm);
 
-        var result = await _signInManager.PasswordSignInAsync(vm.Email, vm.Password, vm.RememberMe, lockoutOnFailure: false);
+        var result = await _signInManager.PasswordSignInAsync(vm.Email, vm.Password, vm.RememberMe, lockoutOnFailure: true);
         if (!result.Succeeded)
         {
             ModelState.AddModelError(string.Empty, "Invalid email or password.");
