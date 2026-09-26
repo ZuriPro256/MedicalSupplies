@@ -109,6 +109,13 @@ public class CategoriesController : Controller
             return RedirectToAction(nameof(Index));
         }
 
+        var hasChildren = await _context.Categories.AnyAsync(c => c.ParentCategoryId == id);
+        if (hasChildren)
+        {
+            TempData["Error"] = "Can't delete a category that still has subcategories. Move or delete the subcategories first.";
+            return RedirectToAction(nameof(Index));
+        }
+
         _context.Categories.Remove(category);
         await _context.SaveChangesAsync();
         TempData["Success"] = "Category deleted.";
