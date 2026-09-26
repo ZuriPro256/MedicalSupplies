@@ -69,7 +69,7 @@ public class AccountController : Controller
         // A guest may have already requested a quotation with this email
         // before ever registering — link that existing Customer record
         // rather than creating a duplicate one.
-        var customer = await _context.Customers.FirstOrDefaultAsync(c => c.Email == vm.Email && c.UserId == null);
+        var customer = await _context.Customers.FirstOrDefaultAsync(c => c.Email != null && EF.Functions.ILike(c.Email, vm.Email) && c.UserId == null);
         var nameParts = vm.FullName.Split(' ', 2, StringSplitOptions.RemoveEmptyEntries);
 
         if (customer is null)

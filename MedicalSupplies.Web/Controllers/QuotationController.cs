@@ -105,7 +105,7 @@ public class QuotationController : Controller
         var customer = await GetSignedInCustomerAsync();
         if (customer is null)
         {
-            customer = await _context.Customers.FirstOrDefaultAsync(c => c.Email == vm.Email && c.UserId == null);
+            customer = await _context.Customers.FirstOrDefaultAsync(c => c.Email != null && EF.Functions.ILike(c.Email, vm.Email) && c.UserId == null);
         }
         if (customer is null)
         {
