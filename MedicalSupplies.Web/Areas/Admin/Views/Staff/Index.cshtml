@@ -1,0 +1,136 @@
+@model List<MedicalSupplies.Web.ViewModels.Admin.Staff.StaffListItemViewModel>
+
+@{
+    ViewData["Title"] = "Staff";
+    var search = ViewBag.Search as string;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h1 class="mb-1">Staff</h1>
+        <p class="text-muted mb-0">
+            Manage administrators, sales staff and inventory managers.
+        </p>
+    </div>
+
+    <a asp-action="Create" class="btn btn-primary">
+        Create Staff
+    </a>
+</div>
+
+<form method="get" class="row g-2 mb-4">
+    <div class="col-md-6">
+        <input type="text"
+               name="search"
+               value="@search"
+               class="form-control"
+               placeholder="Search name, email or phone..." />
+    </div>
+
+    <div class="col-auto">
+        <button type="submit" class="btn btn-primary">Search</button>
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(search))
+    {
+        <div class="col-auto">
+            <a asp-action="Index" class="btn btn-outline-secondary">Clear</a>
+        </div>
+    }
+</form>
+
+<div class="table-responsive">
+    <table class="table table-hover bg-white align-middle">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Role</th>
+                <th>Login Status</th>
+                <th></th>
+            </tr>
+        </thead>
+
+        <tbody>
+        @foreach (var staff in Model)
+        {
+            <tr>
+                <td>
+                    <strong>@staff.FullName</strong>
+                </td>
+
+                <td>@staff.Email</td>
+
+                <td>
+                    @if (!string.IsNullOrWhiteSpace(staff.Phone))
+                    {
+                        @staff.Phone
+                    }
+                    else
+                    {
+                        <span class="text-muted">Not provided</span>
+                    }
+                </td>
+
+                <td>
+                    @switch (staff.Role)
+                    {
+                        case "SuperAdmin":
+                            <span class="badge bg-danger">Super Admin</span>
+                            break;
+
+                        case "Admin":
+                            <span class="badge bg-primary">Admin</span>
+                            break;
+
+                        case "Sales":
+                            <span class="badge bg-info text-dark">Sales</span>
+                            break;
+
+                        case "InventoryManager":
+                            <span class="badge bg-warning text-dark">Inventory Manager</span>
+                            break;
+
+                        default:
+                            <span class="badge bg-secondary">@staff.Role</span>
+                            break;
+                    }
+                </td>
+
+                <td>
+                    @if (staff.IsLockedOut)
+                    {
+                        <span class="badge bg-danger">Locked</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-success">Active</span>
+                    }
+                </td>
+
+                <td class="text-end">
+                    <a asp-action="Details"
+                       asp-route-id="@staff.UserId"
+                       class="btn btn-sm btn-outline-primary">
+                        View
+                    </a>
+
+                    <a asp-action="Edit"
+                       asp-route-id="@staff.UserId"
+                       class="btn btn-sm btn-outline-secondary">
+                        Edit
+                    </a>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-light border">
+        No staff accounts found.
+    </div>
+}

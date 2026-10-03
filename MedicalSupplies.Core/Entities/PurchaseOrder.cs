@@ -28,6 +28,9 @@ public class PurchaseOrder
     /// of receiving status, same relationship as Order.PaymentStatus.</summary>
     public PaymentStatus PaymentStatus { get; set; } = PaymentStatus.Pending;
 
+    /// <summary>Total amount actually paid to the supplier for this purchase order.</summary>
+    public decimal AmountPaid { get; set; }
+
     public string? Notes { get; set; }
 
     /// <summary>AspNetUsers.Id / display name of the staff member who raised this purchase order.</summary>
@@ -36,5 +39,14 @@ public class PurchaseOrder
     public DateTime? ApprovedDate { get; set; }
 
     public ICollection<PurchaseOrderDetail> Details { get; set; } = new List<PurchaseOrderDetail>();
+
     public ICollection<InventoryBatch> Batches { get; set; } = new List<InventoryBatch>();
+
+    public ICollection<SupplierPayment> SupplierPayments { get; set; } = new List<SupplierPayment>();
+
+    public ICollection<PurchaseOrderStatusHistory> StatusHistory { get; set; }
+        = new List<PurchaseOrderStatusHistory>();
+
+    public ICollection<PurchaseOrderReturn> Returns { get; set; }
+        = new List<PurchaseOrderReturn>();
 }

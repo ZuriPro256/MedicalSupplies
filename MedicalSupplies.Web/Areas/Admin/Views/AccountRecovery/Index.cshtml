@@ -1,0 +1,178 @@
+@model List<MedicalSupplies.Web.ViewModels.Admin.AccountRecovery.AccountRecoveryListItemViewModel>
+
+@{
+    ViewData["Title"] = "Account Recovery";
+    var status = ViewBag.Status as string;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h1 class="mb-1">Account Recovery</h1>
+        <p class="text-muted mb-0">
+            Review and manage customer account recovery requests.
+        </p>
+    </div>
+</div>
+
+<form method="get" class="row g-2 mb-4">
+    <div class="col-auto">
+        <select name="status" class="form-select">
+            <option value="">All statuses</option>
+            <option value="Pending" selected="@(status == "Pending")">Pending</option>
+            <option value="Approved" selected="@(status == "Approved")">Approved</option>
+            <option value="Rejected" selected="@(status == "Rejected")">Rejected</option>
+            <option value="Completed" selected="@(status == "Completed")">Completed</option>
+        </select>
+    </div>
+
+    <div class="col-auto">
+        <button type="submit" class="btn btn-primary">Filter</button>
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(status))
+    {
+        <div class="col-auto">
+            <a asp-action="Index" class="btn btn-outline-secondary">Clear</a>
+        </div>
+    }
+</form>
+
+<div class="table-responsive">
+    <table class="table table-hover bg-white align-middle">
+        <thead>
+            <tr>
+                <th>Organization / Account</th>
+                <th>Contact</th>
+                <th>Recovery Type</th>
+                <th>Status</th>
+                <th>Submitted</th>
+                <th>Reviewed By</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var request in Model)
+        {
+            <tr>
+                <td>
+                    @if (!string.IsNullOrWhiteSpace(request.OrganizationName))
+                    {
+                        <strong>@request.OrganizationName</strong>
+                    }
+                    else if (!string.IsNullOrWhiteSpace(request.CustomerName))
+                    {
+                        <strong>@request.CustomerName</strong>
+                    }
+                    else
+                    {
+                        <span class="text-muted">Unnamed customer</span>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(request.CustomerName) &&
+                         !string.Equals(
+                             request.CustomerName,
+                             request.OrganizationName,
+                             StringComparison.OrdinalIgnoreCase))
+                    {
+                        <div class="small text-muted">
+                            @request.CustomerName
+                        </div>
+                    }
+                </td>
+
+                <td>
+                    @if (!string.IsNullOrWhiteSpace(request.SubmittedPhone))
+                    {
+                        <div>@request.SubmittedPhone</div>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(request.SubmittedEmail))
+                    {
+                        <div class="small text-muted">
+                            @request.SubmittedEmail
+                        </div>
+                    }
+                </td>
+
+                <td>@request.RecoveryType</td>
+
+                <td>
+                    @if (string.Equals(
+                        request.Status,
+                        "Pending",
+                        StringComparison.OrdinalIgnoreCase))
+                    {
+                        <span class="badge bg-warning text-dark">Pending</span>
+                    }
+                    else if (string.Equals(
+                        request.Status,
+                        "Approved",
+                        StringComparison.OrdinalIgnoreCase))
+                    {
+                        <span class="badge bg-success">Approved</span>
+                    }
+                    else if (string.Equals(
+                        request.Status,
+                        "Rejected",
+                        StringComparison.OrdinalIgnoreCase))
+                    {
+                        <span class="badge bg-danger">Rejected</span>
+                    }
+                    else if (string.Equals(
+                        request.Status,
+                        "Completed",
+                        StringComparison.OrdinalIgnoreCase))
+                    {
+                        <span class="badge bg-secondary">Completed</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-light text-dark">
+                            @request.Status
+                        </span>
+                    }
+                </td>
+
+                <td>
+                    @request.CreatedDate.ToLocalTime().ToString("dd MMM yyyy HH:mm")
+                </td>
+
+                <td>
+                    @if (!string.IsNullOrWhiteSpace(request.ReviewedBy))
+                    {
+                        <span>@request.ReviewedBy</span>
+
+                        @if (request.ReviewedDate.HasValue)
+                        {
+                            <div class="small text-muted">
+                                @request.ReviewedDate.Value
+                                    .ToLocalTime()
+                                    .ToString("dd MMM yyyy HH:mm")
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <span class="text-muted">Not reviewed</span>
+                    }
+                </td>
+
+                <td class="text-end">
+                    <a asp-action="Details"
+                       asp-route-id="@request.AccountRecoveryRequestId"
+                       class="btn btn-sm btn-outline-primary">
+                        View
+                    </a>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-light border">
+        No account recovery requests found.
+    </div>
+}

@@ -9,4 +9,12 @@ namespace MedicalSupplies.Infrastructure.Identity;
 public class ApplicationUser : IdentityUser
 {
     public string? FullName { get; set; }
+
+    public bool IsActive { get; set; } = true;
+
+    /// <summary>
+    /// Forces the user to choose a new password after an administrator
+    /// has recovered the account using a temporary password.
+    /// </summary>
+    public bool MustChangePassword { get; set; }
 }

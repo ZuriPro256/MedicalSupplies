@@ -22,6 +22,73 @@ namespace MedicalSupplies.Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("MedicalSupplies.Core.Entities.AccountRecoveryRequest", b =>
+                {
+                    b.Property<int>("AccountRecoveryRequestId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("AccountRecoveryRequestId"));
+
+                    b.Property<DateTime?>("CompletedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("NewContactPhone")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("Reason")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("RecoveryType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("ReviewedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("character varying(450)");
+
+                    b.Property<DateTime?>("ReviewedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)");
+
+                    b.Property<string>("SubmittedEmail")
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
+
+                    b.Property<string>("SubmittedPhone")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("VerificationMethod")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("VerificationNotes")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.HasKey("AccountRecoveryRequestId");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("Status");
+
+                    b.ToTable("AccountRecoveryRequests");
+                });
+
             modelBuilder.Entity("MedicalSupplies.Core.Entities.Brand", b =>
                 {
                     b.Property<int>("BrandId")
@@ -279,10 +346,16 @@ namespace MedicalSupplies.Infrastructure.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
+                    b.Property<string>("Url")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
                     b.Property<string>("UserId")
                         .HasColumnType("text");
 
                     b.HasKey("NotificationId");
+
+                    b.HasIndex("UserId", "IsRead");
 
                     b.ToTable("Notifications");
                 });
@@ -303,6 +376,9 @@ namespace MedicalSupplies.Infrastructure.Migrations
 
                     b.Property<DateTime?>("DeliveredDate")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal>("DeliveryCost")
+                        .HasColumnType("numeric");
 
                     b.Property<string>("DeliveryLocation")
                         .HasMaxLength(300)
@@ -435,11 +511,22 @@ namespace MedicalSupplies.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ProductId"));
 
+                    b.Property<string>("Availability")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)")
+                        .HasDefaultValue("InStock");
+
                     b.Property<int?>("BrandId")
                         .HasColumnType("integer");
 
                     b.Property<int>("CategoryId")
                         .HasColumnType("integer");
+
+                    b.Property<string>("CountryOfOrigin")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("timestamp with time zone");
@@ -472,6 +559,15 @@ namespace MedicalSupplies.Infrastructure.Migrations
 
                     b.Property<bool>("RequiresBatchTracking")
                         .HasColumnType("boolean");
+
+                    b.Property<DateOnly?>("SaleEndDate")
+                        .HasColumnType("date");
+
+                    b.Property<decimal?>("SalePrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateOnly?>("SaleStartDate")
+                        .HasColumnType("date");
 
                     b.Property<decimal?>("SellingPrice")
                         .HasColumnType("decimal(18,2)");
@@ -526,6 +622,55 @@ namespace MedicalSupplies.Infrastructure.Migrations
                     b.ToTable("ProductImages");
                 });
 
+            modelBuilder.Entity("MedicalSupplies.Core.Entities.ProductPriceHistory", b =>
+                {
+                    b.Property<int>("ProductPriceHistoryId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ProductPriceHistoryId"));
+
+                    b.Property<string>("ChangedBy")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<DateTime>("ChangedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
+                        .HasDefaultValue("UGX");
+
+                    b.Property<decimal?>("NewAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("PreviousAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("PriceType")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Reason")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.HasKey("ProductPriceHistoryId");
+
+                    b.HasIndex("ChangedDate");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("ProductPriceHistories");
+                });
+
             modelBuilder.Entity("MedicalSupplies.Core.Entities.PurchaseOrder", b =>
                 {
                     b.Property<int>("PurchaseOrderId")
@@ -533,6 +678,9 @@ namespace MedicalSupplies.Infrastructure.Migrations
                         .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("PurchaseOrderId"));
+
+                    b.Property<decimal>("AmountPaid")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("ApprovedBy")
                         .HasMaxLength(450)
@@ -597,7 +745,10 @@ namespace MedicalSupplies.Infrastructure.Migrations
 
                     b.HasIndex("SupplierId");
 
-                    b.ToTable("PurchaseOrders");
+                    b.ToTable("PurchaseOrders", t =>
+                        {
+                            t.HasCheckConstraint("CK_PurchaseOrders_AmountPaid_Valid", "\"AmountPaid\" >= 0 AND \"AmountPaid\" <= \"TotalAmount\"");
+                        });
                 });
 
             modelBuilder.Entity("MedicalSupplies.Core.Entities.PurchaseOrderDetail", b =>
@@ -635,6 +786,123 @@ namespace MedicalSupplies.Infrastructure.Migrations
                     b.ToTable("PurchaseOrderDetails");
                 });
 
+            modelBuilder.Entity("MedicalSupplies.Core.Entities.PurchaseOrderReturn", b =>
+                {
+                    b.Property<int>("PurchaseOrderReturnId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("PurchaseOrderReturnId"));
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<int>("PurchaseOrderId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("RecordedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("character varying(450)");
+
+                    b.Property<DateTime>("ReturnDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ReturnNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.HasKey("PurchaseOrderReturnId");
+
+                    b.HasIndex("PurchaseOrderId");
+
+                    b.HasIndex("ReturnNumber")
+                        .IsUnique();
+
+                    b.ToTable("PurchaseOrderReturns");
+                });
+
+            modelBuilder.Entity("MedicalSupplies.Core.Entities.PurchaseOrderReturnDetail", b =>
+                {
+                    b.Property<int>("PurchaseOrderReturnDetailId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("PurchaseOrderReturnDetailId"));
+
+                    b.Property<int>("BatchId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<int>("PurchaseOrderDetailId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("PurchaseOrderReturnId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("QuantityReturned")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("UnitCost")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("PurchaseOrderReturnDetailId");
+
+                    b.HasIndex("BatchId");
+
+                    b.HasIndex("PurchaseOrderDetailId");
+
+                    b.HasIndex("PurchaseOrderReturnId");
+
+                    b.ToTable("PurchaseOrderReturnDetails", t =>
+                        {
+                            t.HasCheckConstraint("CK_PurchaseOrderReturnDetail_QuantityReturned", "\"QuantityReturned\" > 0");
+                        });
+                });
+
+            modelBuilder.Entity("MedicalSupplies.Core.Entities.PurchaseOrderStatusHistory", b =>
+                {
+                    b.Property<int>("PurchaseOrderStatusHistoryId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("PurchaseOrderStatusHistoryId"));
+
+                    b.Property<string>("ChangedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("character varying(450)");
+
+                    b.Property<DateTime>("ChangedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<int>("PurchaseOrderId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)");
+
+                    b.HasKey("PurchaseOrderStatusHistoryId");
+
+                    b.HasIndex("PurchaseOrderId", "ChangedDate");
+
+                    b.ToTable("PurchaseOrderStatusHistories");
+                });
+
             modelBuilder.Entity("MedicalSupplies.Core.Entities.Quotation", b =>
                 {
                     b.Property<int>("QuotationId")
@@ -643,9 +911,15 @@ namespace MedicalSupplies.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("QuotationId"));
 
+                    b.Property<int?>("AcceptedOfferId")
+                        .HasColumnType("integer");
+
                     b.Property<string>("AdminNotes")
                         .HasMaxLength(1000)
                         .HasColumnType("character varying(1000)");
+
+                    b.Property<decimal?>("CustomerExpectedPrice")
+                        .HasColumnType("numeric");
 
                     b.Property<int>("CustomerId")
                         .HasColumnType("integer");
@@ -653,6 +927,9 @@ namespace MedicalSupplies.Infrastructure.Migrations
                     b.Property<string>("CustomerNotes")
                         .HasMaxLength(1000)
                         .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("CustomerRejectionComment")
+                        .HasColumnType("text");
 
                     b.Property<string>("DeliveryLocation")
                         .HasMaxLength(300)
@@ -672,6 +949,12 @@ namespace MedicalSupplies.Infrastructure.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
+                    b.Property<DateTime?>("RejectedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("RejectionReason")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime>("RequestDate")
                         .HasColumnType("timestamp with time zone");
 
@@ -687,6 +970,8 @@ namespace MedicalSupplies.Infrastructure.Migrations
                         .HasColumnType("date");
 
                     b.HasKey("QuotationId");
+
+                    b.HasIndex("AcceptedOfferId");
 
                     b.HasIndex("CustomerId");
 
@@ -726,6 +1011,118 @@ namespace MedicalSupplies.Infrastructure.Migrations
                     b.HasIndex("QuotationId");
 
                     b.ToTable("QuotationDetails");
+                });
+
+            modelBuilder.Entity("MedicalSupplies.Core.Entities.QuotationOffer", b =>
+                {
+                    b.Property<int>("QuotationOfferId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("QuotationOfferId"));
+
+                    b.Property<string>("AdminNotes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal?>("CustomerExpectedPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("CustomerRejectionComment")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<decimal>("DeliveryCost")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("decimal(18,2)")
+                        .HasDefaultValue(0m);
+
+                    b.Property<decimal?>("DiscountAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("OfferNumber")
+                        .IsRequired()
+                        .HasMaxLength(60)
+                        .HasColumnType("character varying(60)");
+
+                    b.Property<string>("PreparedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("character varying(450)");
+
+                    b.Property<int>("QuotationId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("RejectedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("RejectionReason")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<DateTime?>("RespondedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("RevisionNumber")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("SentDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)");
+
+                    b.Property<decimal?>("TotalAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateOnly?>("ValidUntil")
+                        .HasColumnType("date");
+
+                    b.HasKey("QuotationOfferId");
+
+                    b.HasIndex("OfferNumber")
+                        .IsUnique();
+
+                    b.HasIndex("QuotationId", "RevisionNumber")
+                        .IsUnique();
+
+                    b.ToTable("QuotationOffers");
+                });
+
+            modelBuilder.Entity("MedicalSupplies.Core.Entities.QuotationOfferDetail", b =>
+                {
+                    b.Property<int>("QuotationOfferDetailId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("QuotationOfferDetailId"));
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("QuotationOfferId")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal?>("TotalPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("UnitPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("QuotationOfferDetailId");
+
+                    b.HasIndex("ProductId");
+
+                    b.HasIndex("QuotationOfferId");
+
+                    b.ToTable("QuotationOfferDetails");
                 });
 
             modelBuilder.Entity("MedicalSupplies.Core.Entities.StockMovement", b =>
@@ -850,6 +1247,92 @@ namespace MedicalSupplies.Infrastructure.Migrations
                     b.ToTable("Suppliers");
                 });
 
+            modelBuilder.Entity("MedicalSupplies.Core.Entities.SupplierPayment", b =>
+                {
+                    b.Property<int>("SupplierPaymentId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("SupplierPaymentId"));
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool>("IsReversed")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<DateTime>("PaymentDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("PaymentMethod")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<int>("PurchaseOrderId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("RecordedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("character varying(450)");
+
+                    b.Property<string>("ReferenceNumber")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("ReversalReason")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("ReversedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("character varying(450)");
+
+                    b.Property<DateTime?>("ReversedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("SupplierPaymentId");
+
+                    b.HasIndex("PurchaseOrderId");
+
+                    b.ToTable("SupplierPayments", t =>
+                        {
+                            t.HasCheckConstraint("CK_SupplierPayments_Amount_Positive", "\"Amount\" > 0");
+
+                            t.HasCheckConstraint("CK_SupplierPayments_Reversal_State", "(\n    \"IsReversed\" = FALSE\n    AND \"ReversedDate\" IS NULL\n    AND \"ReversedBy\" IS NULL\n    AND \"ReversalReason\" IS NULL\n)\nOR\n(\n    \"IsReversed\" = TRUE\n    AND \"ReversedDate\" IS NOT NULL\n    AND \"ReversedBy\" IS NOT NULL\n    AND btrim(\"ReversedBy\") <> ''\n    AND \"ReversalReason\" IS NOT NULL\n    AND btrim(\"ReversalReason\") <> ''\n)");
+                        });
+                });
+
+            modelBuilder.Entity("MedicalSupplies.Core.Entities.UserPermission", b =>
+                {
+                    b.Property<int>("UserPermissionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("UserPermissionId"));
+
+                    b.Property<string>("Permission")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("character varying(450)");
+
+                    b.HasKey("UserPermissionId");
+
+                    b.HasIndex("UserId", "Permission")
+                        .IsUnique();
+
+                    b.ToTable("UserPermissions");
+                });
+
             modelBuilder.Entity("MedicalSupplies.Infrastructure.Identity.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
@@ -872,11 +1355,17 @@ namespace MedicalSupplies.Infrastructure.Migrations
                     b.Property<string>("FullName")
                         .HasColumnType("text");
 
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("boolean");
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("MustChangePassword")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
@@ -1049,6 +1538,17 @@ namespace MedicalSupplies.Infrastructure.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("MedicalSupplies.Core.Entities.AccountRecoveryRequest", b =>
+                {
+                    b.HasOne("MedicalSupplies.Core.Entities.Customer", "Customer")
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+                });
+
             modelBuilder.Entity("MedicalSupplies.Core.Entities.Category", b =>
                 {
                     b.HasOne("MedicalSupplies.Core.Entities.Category", "ParentCategory")
@@ -1179,6 +1679,17 @@ namespace MedicalSupplies.Infrastructure.Migrations
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("MedicalSupplies.Core.Entities.ProductPriceHistory", b =>
+                {
+                    b.HasOne("MedicalSupplies.Core.Entities.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+                });
+
             modelBuilder.Entity("MedicalSupplies.Core.Entities.PurchaseOrder", b =>
                 {
                     b.HasOne("MedicalSupplies.Core.Entities.Supplier", "Supplier")
@@ -1209,13 +1720,69 @@ namespace MedicalSupplies.Infrastructure.Migrations
                     b.Navigation("PurchaseOrder");
                 });
 
+            modelBuilder.Entity("MedicalSupplies.Core.Entities.PurchaseOrderReturn", b =>
+                {
+                    b.HasOne("MedicalSupplies.Core.Entities.PurchaseOrder", "PurchaseOrder")
+                        .WithMany("Returns")
+                        .HasForeignKey("PurchaseOrderId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("PurchaseOrder");
+                });
+
+            modelBuilder.Entity("MedicalSupplies.Core.Entities.PurchaseOrderReturnDetail", b =>
+                {
+                    b.HasOne("MedicalSupplies.Core.Entities.InventoryBatch", "Batch")
+                        .WithMany()
+                        .HasForeignKey("BatchId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("MedicalSupplies.Core.Entities.PurchaseOrderDetail", "PurchaseOrderDetail")
+                        .WithMany()
+                        .HasForeignKey("PurchaseOrderDetailId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("MedicalSupplies.Core.Entities.PurchaseOrderReturn", "PurchaseOrderReturn")
+                        .WithMany("Details")
+                        .HasForeignKey("PurchaseOrderReturnId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Batch");
+
+                    b.Navigation("PurchaseOrderDetail");
+
+                    b.Navigation("PurchaseOrderReturn");
+                });
+
+            modelBuilder.Entity("MedicalSupplies.Core.Entities.PurchaseOrderStatusHistory", b =>
+                {
+                    b.HasOne("MedicalSupplies.Core.Entities.PurchaseOrder", "PurchaseOrder")
+                        .WithMany("StatusHistory")
+                        .HasForeignKey("PurchaseOrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PurchaseOrder");
+                });
+
             modelBuilder.Entity("MedicalSupplies.Core.Entities.Quotation", b =>
                 {
+                    b.HasOne("MedicalSupplies.Core.Entities.QuotationOffer", "AcceptedOffer")
+                        .WithMany()
+                        .HasForeignKey("AcceptedOfferId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("MedicalSupplies.Core.Entities.Customer", "Customer")
                         .WithMany("Quotations")
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("AcceptedOffer");
 
                     b.Navigation("Customer");
                 });
@@ -1237,6 +1804,36 @@ namespace MedicalSupplies.Infrastructure.Migrations
                     b.Navigation("Product");
 
                     b.Navigation("Quotation");
+                });
+
+            modelBuilder.Entity("MedicalSupplies.Core.Entities.QuotationOffer", b =>
+                {
+                    b.HasOne("MedicalSupplies.Core.Entities.Quotation", "Quotation")
+                        .WithMany("Offers")
+                        .HasForeignKey("QuotationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Quotation");
+                });
+
+            modelBuilder.Entity("MedicalSupplies.Core.Entities.QuotationOfferDetail", b =>
+                {
+                    b.HasOne("MedicalSupplies.Core.Entities.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("MedicalSupplies.Core.Entities.QuotationOffer", "QuotationOffer")
+                        .WithMany("Details")
+                        .HasForeignKey("QuotationOfferId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+
+                    b.Navigation("QuotationOffer");
                 });
 
             modelBuilder.Entity("MedicalSupplies.Core.Entities.StockMovement", b =>
@@ -1283,6 +1880,17 @@ namespace MedicalSupplies.Infrastructure.Migrations
                     b.Navigation("PurchaseOrder");
 
                     b.Navigation("ReversesStockMovement");
+                });
+
+            modelBuilder.Entity("MedicalSupplies.Core.Entities.SupplierPayment", b =>
+                {
+                    b.HasOne("MedicalSupplies.Core.Entities.PurchaseOrder", "PurchaseOrder")
+                        .WithMany("SupplierPayments")
+                        .HasForeignKey("PurchaseOrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PurchaseOrder");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -1383,13 +1991,31 @@ namespace MedicalSupplies.Infrastructure.Migrations
                     b.Navigation("Batches");
 
                     b.Navigation("Details");
+
+                    b.Navigation("Returns");
+
+                    b.Navigation("StatusHistory");
+
+                    b.Navigation("SupplierPayments");
+                });
+
+            modelBuilder.Entity("MedicalSupplies.Core.Entities.PurchaseOrderReturn", b =>
+                {
+                    b.Navigation("Details");
                 });
 
             modelBuilder.Entity("MedicalSupplies.Core.Entities.Quotation", b =>
                 {
                     b.Navigation("Details");
 
+                    b.Navigation("Offers");
+
                     b.Navigation("Orders");
+                });
+
+            modelBuilder.Entity("MedicalSupplies.Core.Entities.QuotationOffer", b =>
+                {
+                    b.Navigation("Details");
                 });
 
             modelBuilder.Entity("MedicalSupplies.Core.Entities.Supplier", b =>

@@ -34,24 +34,58 @@ public class OrderFulfillmentService : IOrderFulfillmentService
     {
         var insufficient = new List<string>();
 
-        // Load everything we might need to allocate from, up front, so the
-        // check-then-deduct below never has to hit the database mid-loop.
+        // Load the products first so we know which order lines actually require
+        // batch-level stock tracking.
         var productIds = order.Details.Select(d => d.ProductId).Distinct().ToList();
+
         var products = await _context.Products
             .Where(p => productIds.Contains(p.ProductId))
             .ToDictionaryAsync(p => p.ProductId);
 
+        var trackedProductIds = order.Details
+            .Where(d => products[d.ProductId].RequiresBatchTracking)
+            .Select(d => d.ProductId)
+            .Distinct()
+            .ToList();
+
+        if (trackedProductIds.Count == 0)
+            return new StockAllocationResult(true, insufficient);
+
+        // The ChangeStatus transaction is already open when this method is called.
+        // FOR UPDATE locks the actual inventory rows until that transaction commits
+        // or rolls back. This prevents two concurrent orders from both consuming
+        // the same QuantityAvailable value.
+        //
+        // Batch IDs are used as the lock order so concurrent transactions acquire
+        // locks consistently, reducing the chance of deadlocks.
+        var today = DateOnly.FromDateTime(DateTime.UtcNow.AddHours(3));
+
         var batchList = await _context.InventoryBatches
-            .Where(b => productIds.Contains(b.ProductId) && b.Status == BatchStatus.Active && b.QuantityAvailable > 0)
+            .FromSqlInterpolated($"""
+                SELECT *
+                FROM "InventoryBatches"
+                WHERE "ProductId" = ANY({trackedProductIds.ToArray()})
+                  AND "Status" = {BatchStatus.Active.ToString()}
+                  AND "QuantityAvailable" > 0
+                  AND ("ExpiryDate" IS NULL OR "ExpiryDate" >= {today})
+                ORDER BY "BatchId"
+                FOR UPDATE
+                """)
+            .ToListAsync();
+
+        // Re-sort after locking into FEFO order. The database lock order remains
+        // BatchId ascending; allocation order remains earliest expiry first.
+        batchList = batchList
             .OrderBy(b => b.ExpiryDate ?? DateOnly.MaxValue)
             .ThenBy(b => b.BatchId)
-            .ToListAsync();
+            .ToList();
+
         var batchesByProduct = batchList
             .GroupBy(b => b.ProductId)
             .ToDictionary(g => g.Key, g => g.ToList());
 
         // Check total available stock first — an order should never end up
-        // partially deducted. Nothing is written until every line clears.
+        // partially deducted. Nothing is written until every tracked line clears.
         foreach (var detail in order.Details)
         {
             var product = products[detail.ProductId];
@@ -74,8 +108,7 @@ public class OrderFulfillmentService : IOrderFulfillmentService
 
         // Sufficient everywhere — now actually allocate, earliest-expiry-first.
         // One StockMovement per batch touched; that set of rows is the only
-        // record of which batches fulfilled this line (Batch A -> 200,
-        // Batch B -> 200, Batch C -> 100, etc.) — nothing on OrderDetail itself.
+        // record of which batches fulfilled this line.
         foreach (var detail in order.Details)
         {
             var product = products[detail.ProductId];
@@ -121,7 +154,13 @@ public class OrderFulfillmentService : IOrderFulfillmentService
 
         var batchIds = processingMovements.Where(m => m.BatchId.HasValue).Select(m => m.BatchId!.Value).Distinct().ToList();
         var batches = await _context.InventoryBatches
-            .Where(b => batchIds.Contains(b.BatchId))
+            .FromSqlInterpolated($"""
+                SELECT *
+                FROM "InventoryBatches"
+                WHERE "BatchId" = ANY({batchIds.ToArray()})
+                ORDER BY "BatchId"
+                FOR UPDATE
+                """)
             .ToDictionaryAsync(b => b.BatchId);
 
         // Each original OrderProcessing movement is left exactly as it was —

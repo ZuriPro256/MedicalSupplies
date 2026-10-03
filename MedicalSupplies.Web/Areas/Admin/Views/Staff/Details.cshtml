@@ -1,0 +1,97 @@
+@model MedicalSupplies.Web.ViewModels.Admin.Staff.StaffListItemViewModel
+
+@{
+    ViewData["Title"] = "Staff Details";
+}
+
+<div class="container-fluid">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-1">Staff Details</h1>
+            <p class="text-muted mb-0">
+                Review this staff account.
+            </p>
+        </div>
+
+        <div class="d-flex gap-2">
+            <a asp-action="Edit"
+               asp-route-id="@Model.UserId"
+               class="btn btn-primary">
+                Edit Staff
+            </a>
+
+            <a asp-action="Index"
+               class="btn btn-outline-secondary">
+                Back to Staff
+            </a>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header">
+            <strong>Account Information</strong>
+        </div>
+
+        <div class="card-body">
+
+            <dl class="row mb-0">
+
+                <dt class="col-sm-3">Full Name</dt>
+                <dd class="col-sm-9">@Model.FullName</dd>
+
+                <dt class="col-sm-3">Email</dt>
+                <dd class="col-sm-9">@Model.Email</dd>
+
+                <dt class="col-sm-3">Phone</dt>
+                <dd class="col-sm-9">
+                    @(string.IsNullOrWhiteSpace(Model.Phone)
+                        ? "—"
+                        : Model.Phone)
+                </dd>
+
+                <dt class="col-sm-3">Role</dt>
+                <dd class="col-sm-9">@Model.Role</dd>
+
+                <dt class="col-sm-3">Account Status</dt>
+                <dd class="col-sm-9">
+                    @if (Model.IsActive)
+                    {
+                        <span class="badge bg-success">Active</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">Inactive</span>
+                    }
+                </dd>
+
+                <dt class="col-sm-3">Email Confirmed</dt>
+                <dd class="col-sm-9">
+                    @if (Model.EmailConfirmed)
+                    {
+                        <span class="badge bg-success">Yes</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-warning text-dark">No</span>
+                    }
+                </dd>
+
+                <dt class="col-sm-3">Login Lock</dt>
+                <dd class="col-sm-9">
+                    @if (Model.IsLockedOut)
+                    {
+                        <span class="badge bg-danger">Locked</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-success">Not Locked</span>
+                    }
+                </dd>
+
+            </dl>
+
+        </div>
+    </div>
+
+</div>

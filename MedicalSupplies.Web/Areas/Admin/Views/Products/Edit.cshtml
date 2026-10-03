@@ -1,48 +1,99 @@
 @model ProductFormViewModel
-@{ ViewData["Title"] = "Edit Product"; }
+@{
+    ViewData["Title"] = "Edit Product";
+    var primaryImage = Model.ExistingImages.FirstOrDefault(i => i.IsPrimary);
+    var otherImages = Model.ExistingImages.Where(i => !i.IsPrimary).ToList();
+}
 
 <h1>Edit Product</h1>
 
-<form asp-action="Edit" asp-route-id="@Model.ProductId" method="post" enctype="multipart/form-data" class="col-md-8">
+<form asp-action="Edit"
+      asp-route-id="@Model.ProductId"
+      method="post"
+      enctype="multipart/form-data"
+      class="col-md-8">
+
     <input type="hidden" asp-for="ProductId" />
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
     <partial name="_ProductFormFields" />
 
-    @if (Model.ExistingImages.Any())
-    {
-        <h5 class="mt-4">Existing Images</h5>
-        <div class="row g-3 mb-3">
-            @foreach (var image in Model.ExistingImages)
-            {
-                <div class="col-3">
-                    <div class="card">
-                        <img src="@image.ImageUrl" class="card-img-top" style="height:100px; object-fit:cover;" />
-                        <div class="card-body p-2 text-center">
-                            @if (image.IsPrimary)
-                            {
-                                <span class="badge bg-primary">Primary</span>
-                            }
-                            else
-                            {
+    <button type="submit" class="btn btn-primary">Save Product</button>
+    <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+</form>
+
+@if (primaryImage is not null)
+{
+    <div class="card mt-4 col-md-8">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <strong>Primary Image</strong>
+            <span class="badge bg-primary">Primary</span>
+        </div>
+
+        <div class="card-body">
+            <div class="row align-items-center">
+                <div class="col-md-5">
+                    <img src="@primaryImage.ImageUrl"
+                         class="img-fluid rounded border"
+                         style="max-height:260px; object-fit:contain;" />
+                </div>
+
+                <div class="col-md-7">
+                    <form asp-action="ReplacePrimaryImage"
+                          method="post"
+                          enctype="multipart/form-data"
+                          class="mb-3">
+                        <input type="hidden" name="productId" value="@Model.ProductId" />
+                        <label class="form-label">Replace primary image</label>
+                        <input type="file" name="replacement" accept="image/*" class="form-control mb-2" required />
+                        <button type="submit" class="btn btn-primary">Replace Primary Image</button>
+                    </form>
+
+                    <form asp-action="DeleteImage"
+                          method="post"
+                          onsubmit="return confirm('Remove the primary image? The first remaining image will become primary.');">
+                        <input type="hidden" name="productImageId" value="@primaryImage.ProductImageId" />
+                        <input type="hidden" name="productId" value="@Model.ProductId" />
+                        <button type="submit" class="btn btn-outline-danger">Remove Primary Image</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@if (otherImages.Any())
+{
+    <div class="card mt-4 col-md-8">
+        <div class="card-header"><strong>Other Images</strong></div>
+        <div class="card-body">
+            <div class="row g-3">
+                @foreach (var image in otherImages)
+                {
+                    <div class="col-md-4">
+                        <div class="card h-100">
+                            <img src="@image.ImageUrl" class="card-img-top" style="height:160px; object-fit:contain;" />
+                            <div class="card-body text-center">
                                 <form asp-action="SetPrimaryImage" method="post" class="d-inline">
                                     <input type="hidden" name="productImageId" value="@image.ProductImageId" />
                                     <input type="hidden" name="productId" value="@Model.ProductId" />
-                                    <button type="submit" class="btn btn-sm btn-link p-0">Make primary</button>
+                                    <button type="submit" class="btn btn-sm btn-outline-primary">Make Primary</button>
                                 </form>
-                            }
-                            <form asp-action="DeleteImage" method="post" class="d-inline"
-                                  onsubmit="return confirm('Remove this image?');">
-                                <input type="hidden" name="productImageId" value="@image.ProductImageId" />
-                                <input type="hidden" name="productId" value="@Model.ProductId" />
-                                <button type="submit" class="btn btn-sm btn-link text-danger p-0">Remove</button>
-                            </form>
+
+                                <form asp-action="DeleteImage" method="post" class="d-inline" onsubmit="return confirm('Remove this image?');">
+                                    <input type="hidden" name="productImageId" value="@image.ProductImageId" />
+                                    <input type="hidden" name="productId" value="@Model.ProductId" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Remove</button>
+                                </form>
+                            </div>
                         </div>
                     </div>
-                </div>
-            }
+                }
+            </div>
         </div>
-    }
+    </div>
+}
 
-    <button type="submit" class="btn btn-primary">Save</button>
-    <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
-</form>
+<div class="mt-4 col-md-8">
+    <a asp-action="Index" class="btn btn-link ps-0">← Back to Products</a>
+</div>

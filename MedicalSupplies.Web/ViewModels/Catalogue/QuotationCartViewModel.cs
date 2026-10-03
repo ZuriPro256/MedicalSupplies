@@ -28,7 +28,10 @@ public class QuotationRequestFormViewModel
     [Required, EmailAddress, StringLength(150)]
     public string Email { get; set; } = string.Empty;
 
-    [Required, Phone, StringLength(50)]
+    [Required, Display(Name = "Phone Country")]
+    public string CountryCode { get; set; } = "UG";
+
+    [Required, StringLength(50), Display(Name = "Phone Number")]
     public string Phone { get; set; } = string.Empty;
 
     [StringLength(300), Display(Name = "Delivery Location")]

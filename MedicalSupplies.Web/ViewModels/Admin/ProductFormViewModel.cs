@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using MedicalSupplies.Core.Enums;
 using Microsoft.AspNetCore.Http;
 
 namespace MedicalSupplies.Web.ViewModels.Admin;
@@ -21,6 +22,15 @@ public class ProductFormViewModel
     [Display(Name = "Brand")]
     public int? BrandId { get; set; }
 
+    [StringLength(150), Display(Name = "Brand Name")]
+    public string? BrandName { get; set; }
+
+    [StringLength(100), Display(Name = "Brand Country of Origin")]
+    public string? BrandCountry { get; set; }
+
+    [StringLength(100), Display(Name = "Country of Origin")]
+    public string? CountryOfOrigin { get; set; }
+
     public string? Description { get; set; }
 
     public string? Specifications { get; set; }
@@ -31,9 +41,28 @@ public class ProductFormViewModel
     [StringLength(100), Display(Name = "Pack Size")]
     public string? PackSize { get; set; }
 
-    [Display(Name = "Selling Price (UGX)")]
+    [Display(Name = "Regular Selling Price (UGX)")]
     [Range(0, double.MaxValue, ErrorMessage = "Price cannot be negative.")]
     public decimal? SellingPrice { get; set; }
+
+    [Display(Name = "Sale Price (UGX)")]
+    [Range(0, double.MaxValue, ErrorMessage = "Sale price cannot be negative.")]
+    public decimal? SalePrice { get; set; }
+
+    [Display(Name = "Sale Start Date")]
+    [DataType(DataType.Date)]
+    public DateOnly? SaleStartDate { get; set; }
+
+    [Display(Name = "Sale End Date")]
+    [DataType(DataType.Date)]
+    public DateOnly? SaleEndDate { get; set; }
+
+    [StringLength(500)]
+    [Display(Name = "Price Change Reason")]
+    public string? PriceChangeReason { get; set; }
+
+    [Required, Display(Name = "Catalogue Availability")]
+    public ProductAvailability Availability { get; set; } = ProductAvailability.InStock;
 
     [Display(Name = "Reorder Level")]
     [Range(0, int.MaxValue)]

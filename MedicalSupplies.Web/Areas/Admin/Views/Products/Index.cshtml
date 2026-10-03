@@ -1,44 +1,252 @@
 @model List<ProductListItemViewModel>
-@{ ViewData["Title"] = "Products"; }
+
+@{
+    ViewData["Title"] = "Products";
+}
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h1>Products</h1>
     <a class="btn btn-primary" asp-action="Create">+ Add Product</a>
 </div>
 
-<form method="get" class="mb-3 col-md-4">
-    <input type="text" name="search" value="@ViewBag.Search" class="form-control" placeholder="Search by name or code..." />
+<form method="get" class="card mb-4">
+    <div class="card-body">
+        <div class="row g-3 align-items-end">
+            <div class="col-lg-4">
+                <label for="search" class="form-label">Search</label>
+                <input type="text"
+                       id="search"
+                       name="search"
+                       value="@ViewBag.Search"
+                       class="form-control"
+                       placeholder="Search by product name or code..." />
+                <div class="form-text">
+                    Partial search works — even the first few letters are enough.
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-2">
+                <label for="categoryId" class="form-label">Category</label>
+                <select id="categoryId"
+                        name="categoryId"
+                        class="form-select">
+                    <option value="">All Categories</option>
+                    @foreach (var category in ViewBag.Categories)
+                    {
+                        <option value="@category.Value"
+                                selected="@(ViewBag.CategoryId?.ToString() == category.Value.ToString() ? "selected" : null)">
+                            @category.Text
+                        </option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-6 col-lg-2">
+                <label for="brandId" class="form-label">Brand</label>
+                <select id="brandId"
+                        name="brandId"
+                        class="form-select">
+                    <option value="">All Brands</option>
+                    @foreach (var brand in ViewBag.Brands)
+                    {
+                        <option value="@brand.Value"
+                                selected="@(ViewBag.BrandId?.ToString() == brand.Value.ToString() ? "selected" : null)">
+                            @brand.Text
+                        </option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-6 col-lg-2">
+                <label for="availability" class="form-label">Availability</label>
+                <select id="availability"
+                        name="availability"
+                        class="form-select">
+                    <option value="">All</option>
+                    <option value="InStock"
+                            selected="@(ViewBag.Availability?.ToString() == "InStock" ? "selected" : null)">
+                        In Stock
+                    </option>
+                    <option value="AvailableOnRequest"
+                            selected="@(ViewBag.Availability?.ToString() == "AvailableOnRequest" ? "selected" : null)">
+                        Available on Request
+                    </option>
+                    <option value="QuotationRequired"
+                            selected="@(ViewBag.Availability?.ToString() == "QuotationRequired" ? "selected" : null)">
+                        Quotation Required
+                    </option>
+                    <option value="OutOfStock"
+                            selected="@(ViewBag.Availability?.ToString() == "OutOfStock" ? "selected" : null)">
+                        Out of Stock
+                    </option>
+                    <option value="ComingSoon"
+                            selected="@(ViewBag.Availability?.ToString() == "ComingSoon" ? "selected" : null)">
+                        Coming Soon
+                    </option>
+                </select>
+            </div>
+
+            <div class="col-md-6 col-lg-2">
+                <label for="stock" class="form-label">Stock</label>
+                <select id="stock"
+                        name="stock"
+                        class="form-select">
+                    <option value="">All Stock</option>
+                    <option value="in"
+                            selected="@(string.Equals(ViewBag.Stock as string, "in", StringComparison.OrdinalIgnoreCase) ? "selected" : null)">
+                        In Stock
+                    </option>
+                    <option value="low"
+                            selected="@(string.Equals(ViewBag.Stock as string, "low", StringComparison.OrdinalIgnoreCase) ? "selected" : null)">
+                        Low Stock
+                    </option>
+                    <option value="out"
+                            selected="@(string.Equals(ViewBag.Stock as string, "out", StringComparison.OrdinalIgnoreCase) ? "selected" : null)">
+                        Out of Stock
+                    </option>
+                </select>
+            </div>
+
+            <div class="col-lg-12 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    Search
+                </button>
+
+                <a asp-action="Index" class="btn btn-outline-secondary">
+                    Clear Filters
+                </a>
+            </div>
+        </div>
+    </div>
 </form>
 
-<table class="table table-striped bg-white align-middle">
-    <thead>
-        <tr>
-            <th>Code</th><th>Name</th><th>Category</th><th>Brand</th>
-            <th>Price</th><th>Stock</th><th>Active</th><th></th>
-        </tr>
-    </thead>
-    <tbody>
-    @foreach (var product in Model)
-    {
-        <tr>
-            <td>@product.ProductCode</td>
-            <td>@product.ProductName</td>
-            <td>@product.CategoryName</td>
-            <td>@product.BrandName</td>
-            <td>@(product.SellingPrice is null ? "Request quote" : $"UGX {product.SellingPrice:N0}")</td>
-            <td>
-                @product.TotalAvailable
-                @if (product.IsLowStock)
-                {
-                    <span class="badge bg-warning text-dark">Low stock</span>
-                }
-            </td>
-            <td>@(product.IsActive ? "Yes" : "No")</td>
-            <td>
-                <a class="btn btn-sm btn-outline-secondary" asp-action="Edit" asp-route-id="@product.ProductId">Edit</a>
-                <a class="btn btn-sm btn-outline-secondary" asp-controller="InventoryBatches" asp-action="Index" asp-route-productId="@product.ProductId">Batches</a>
-            </td>
-        </tr>
-    }
-    </tbody>
-</table>
+<div class="table-responsive">
+    <table class="table table-striped bg-white align-middle">
+        <thead>
+            <tr>
+                <th>Code</th>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Brand</th>
+                <th>Price</th>
+                <th>Availability</th>
+                <th>Stock</th>
+                <th>Active</th>
+                <th></th>
+            </tr>
+        </thead>
+
+        <tbody>
+        @foreach (var product in Model)
+        {
+            <tr>
+                <td>@product.ProductCode</td>
+
+                <td>
+                    <strong>@product.ProductName</strong>
+
+                    @if (product.IsOnSale)
+                    {
+                        <div>
+                            <span class="badge bg-danger">On Sale</span>
+                        </div>
+                    }
+                </td>
+
+                <td>@product.CategoryName</td>
+
+                <td>@product.BrandName</td>
+
+                <td>
+                    @if (product.IsOnSale)
+                    {
+                        <div class="small text-muted text-decoration-line-through">
+                            UGX @product.SellingPrice?.ToString("N0")
+                        </div>
+                        <div class="fw-semibold text-danger">
+                            UGX @product.SalePrice?.ToString("N0")
+                        </div>
+                    }
+                    else if (product.SellingPrice.HasValue)
+                    {
+                        <span>UGX @product.SellingPrice.Value.ToString("N0")</span>
+                    }
+                    else
+                    {
+                        <span class="text-muted">Request quote</span>
+                    }
+                </td>
+
+                <td>
+                    @switch (product.EffectiveAvailability)
+                    {
+                        case MedicalSupplies.Core.Enums.ProductAvailability.InStock:
+                            <span class="badge bg-success">In Stock</span>
+                            break;
+
+                        case MedicalSupplies.Core.Enums.ProductAvailability.AvailableOnRequest:
+                            <span class="badge bg-primary">Available on Request</span>
+                            break;
+
+                        case MedicalSupplies.Core.Enums.ProductAvailability.QuotationRequired:
+                            <span class="badge bg-warning text-dark">Quotation Required</span>
+                            break;
+
+                        case MedicalSupplies.Core.Enums.ProductAvailability.OutOfStock:
+                            <span class="badge bg-secondary">Out of Stock</span>
+                            break;
+
+                        case MedicalSupplies.Core.Enums.ProductAvailability.ComingSoon:
+                            <span class="badge bg-info text-dark">Coming Soon</span>
+                            break;
+                    }
+                </td>
+
+                <td>
+                    @product.TotalAvailable
+
+                    @if (product.IsLowStock)
+                    {
+                        <div>
+                            <span class="badge bg-warning text-dark">Low stock</span>
+                        </div>
+                    }
+                </td>
+
+                <td>
+                    @if (product.IsActive)
+                    {
+                        <span class="badge bg-success">Yes</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">No</span>
+                    }
+                </td>
+
+                <td class="text-nowrap">
+                    <a class="btn btn-sm btn-outline-secondary"
+                       asp-action="Edit"
+                       asp-route-id="@product.ProductId">
+                        Edit
+                    </a>
+
+                    <a class="btn btn-sm btn-outline-secondary"
+                       asp-controller="InventoryBatches"
+                       asp-action="Index"
+                       asp-route-productId="@product.ProductId">
+                        Batches
+                    </a>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
+
+@if (!Model.Any())
+{
+    <p class="text-muted mt-4">
+        No products found.
+    </p>
+}

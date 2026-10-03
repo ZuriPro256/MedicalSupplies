@@ -4,58 +4,116 @@
 <div class="row justify-content-center">
     <div class="col-md-7">
         <h1>Create Your Account</h1>
-        <p class="text-muted">Hospitals, clinics, laboratories, pharmacies, NGOs, distributors and individual
-            healthcare professionals are all welcome — the organization field is optional.</p>
+        <p class="text-muted">
+            Hospitals, clinics, laboratories, pharmacies, NGOs, distributors and individual
+            healthcare professionals are all welcome — the organization field is optional.
+        </p>
 
         <form asp-action="Register" method="post">
             <input type="hidden" asp-for="ReturnUrl" />
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
             <div class="mb-3">
-                <label asp-for="FullName" class="form-label"></label>
-                <input asp-for="FullName" class="form-control" />
+                <label asp-for="FullName" class="form-label">Contact Person / Full Name</label>
+                <input asp-for="FullName"
+                       class="form-control"
+                       placeholder="e.g. Brenda Khemiteto"
+                       autocomplete="name" />
+                <div class="form-text">
+                    Enter the name of the person who will manage this account.
+                </div>
                 <span asp-validation-for="FullName" class="text-danger"></span>
             </div>
 
             <div class="mb-3">
-                <label asp-for="OrganizationName" class="form-label"></label>
-                <input asp-for="OrganizationName" class="form-control" />
+                <label asp-for="OrganizationName" class="form-label">
+                    Organization / Company Name
+                </label>
+                <input asp-for="OrganizationName"
+                       class="form-control"
+                       placeholder="e.g. MEDEVAX MEDICAL SOLUTIONS"
+                       autocomplete="organization" />
+                <div class="form-text">
+                    Leave blank if you are registering as an individual.
+                </div>
+                <span asp-validation-for="OrganizationName" class="text-danger"></span>
             </div>
 
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <label asp-for="Email" class="form-label"></label>
-                    <input asp-for="Email" class="form-control" />
+                    <input asp-for="Email"
+                           class="form-control"
+                           autocomplete="email"
+                           type="email" />
                     <span asp-validation-for="Email" class="text-danger"></span>
                 </div>
+
                 <div class="col-md-6 mb-3">
-                    <label asp-for="Phone" class="form-label"></label>
-                    <input asp-for="Phone" class="form-control" />
-                    <span asp-validation-for="Phone" class="text-danger"></span>
+                    <label asp-for="CountryCode" class="form-label">Phone Country</label>
+                    <select asp-for="CountryCode"
+                            class="form-select"
+                            autocomplete="country">
+                        @foreach (var country in ViewBag.PhoneCountries)
+                        {
+                            <option value="@country.Code">
+                                @country.Name (+@country.CallingCode)
+                            </option>
+                        }
+                    </select>
+                    <span asp-validation-for="CountryCode" class="text-danger"></span>
                 </div>
             </div>
 
             <div class="mb-3">
+                <label asp-for="Phone" class="form-label">Phone Number</label>
+                <input asp-for="Phone"
+                       class="form-control"
+                       autocomplete="tel-national"
+                       type="tel"
+                       inputmode="tel"
+                       placeholder="e.g. 0784342185" />
+                <div class="form-text">
+                    Enter the national phone number only. Select the country above;
+                    do not enter the country calling code.
+                </div>
+                <span asp-validation-for="Phone" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
                 <label asp-for="Address" class="form-label"></label>
-                <input asp-for="Address" class="form-control" />
+                <input asp-for="Address"
+                       class="form-control"
+                       autocomplete="street-address" />
+                <span asp-validation-for="Address" class="text-danger"></span>
             </div>
 
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <label asp-for="Password" class="form-label"></label>
-                    <input asp-for="Password" class="form-control" />
+                    <input asp-for="Password"
+                           class="form-control"
+                           autocomplete="new-password" />
                     <span asp-validation-for="Password" class="text-danger"></span>
                 </div>
+
                 <div class="col-md-6 mb-3">
                     <label asp-for="ConfirmPassword" class="form-label"></label>
-                    <input asp-for="ConfirmPassword" class="form-control" />
+                    <input asp-for="ConfirmPassword"
+                           class="form-control"
+                           autocomplete="new-password" />
                     <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
                 </div>
             </div>
 
-            <button type="submit" class="btn btn-primary">Create Account</button>
+            <button type="submit" class="btn btn-primary">
+                Create Account
+            </button>
         </form>
 
-        <p class="mt-3">Already have an account? <a asp-action="Login" asp-route-returnUrl="@Model.ReturnUrl">Sign in</a></p>
+        <p class="mt-3">
+            Already have an account?
+            <a asp-action="Login" asp-route-returnUrl="@Model.ReturnUrl">Sign in</a>
+        </p>
     </div>
 </div>

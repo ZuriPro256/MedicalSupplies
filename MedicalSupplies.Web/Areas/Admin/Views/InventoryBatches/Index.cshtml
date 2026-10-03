@@ -16,15 +16,23 @@
     <tbody>
     @foreach (var batch in Model)
     {
+        var today = DateOnly.FromDateTime(DateTime.UtcNow.AddHours(3));
+        var isExpired = batch.ExpiryDate.HasValue && batch.ExpiryDate.Value < today;
         var isExpiringSoon = batch.ExpiryDate.HasValue &&
-            batch.ExpiryDate.Value <= DateOnly.FromDateTime(DateTime.UtcNow.AddDays(90));
-        <tr class="@(isExpiringSoon ? "table-warning" : "")">
+            !isExpired &&
+            batch.ExpiryDate.Value <= today.AddDays(90);
+        var rowClass = isExpired ? "table-danger" : isExpiringSoon ? "table-warning" : "";
+        <tr class="@rowClass">
             <td>@batch.Product.ProductName</td>
             <td>@batch.BatchNumber</td>
             <td>@batch.Supplier?.SupplierName</td>
             <td>
                 @batch.ExpiryDate
-                @if (isExpiringSoon)
+                @if (isExpired)
+                {
+                    <span class="badge bg-danger">Expired</span>
+                }
+                else if (isExpiringSoon)
                 {
                     <span class="badge bg-warning text-dark">Expiring soon</span>
                 }

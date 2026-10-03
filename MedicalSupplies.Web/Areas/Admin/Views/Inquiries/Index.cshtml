@@ -1,0 +1,221 @@
+@model IEnumerable<MedicalSupplies.Web.ViewModels.Admin.Inquiries.InquiryListItemViewModel>
+@using MedicalSupplies.Core.Enums
+
+@{
+    ViewData["Title"] = "Inquiries";
+    var selectedStatus = ViewBag.SelectedStatus as EnquiryStatus?;
+    var newCount = (int)(ViewBag.NewCount ?? 0);
+    var inProgressCount = (int)(ViewBag.InProgressCount ?? 0);
+    var resolvedCount = (int)(ViewBag.ResolvedCount ?? 0);
+    var totalCount = (int)(ViewBag.TotalCount ?? 0);
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+    <div>
+        <h1 class="mb-1">Inquiries</h1>
+        <p class="text-muted mb-0">
+            Messages and enquiries received through the website.
+        </p>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-lg-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="small text-muted">All Inquiries</div>
+                <div class="fs-3 fw-semibold">@totalCount</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-sm-6 col-lg-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="small text-muted">New</div>
+                <div class="fs-3 fw-semibold">@newCount</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-sm-6 col-lg-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="small text-muted">In Progress</div>
+                <div class="fs-3 fw-semibold">@inProgressCount</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-sm-6 col-lg-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="small text-muted">Resolved</div>
+                <div class="fs-3 fw-semibold">@resolvedCount</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label">Filter by status</label>
+                <select name="status" class="form-select">
+                    <option value="">All Inquiries</option>
+
+                    @foreach (var item in Enum.GetValues<EnquiryStatus>())
+                    {
+                        if (selectedStatus == item)
+                        {
+                            <option value="@item" selected>
+                                @(item == EnquiryStatus.InProgress ? "In Progress" : item.ToString())
+                            </option>
+                        }
+                        else
+                        {
+                            <option value="@item">
+                                @(item == EnquiryStatus.InProgress ? "In Progress" : item.ToString())
+                            </option>
+                        }
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-auto">
+                <button type="submit" class="btn btn-primary">
+                    Filter
+                </button>
+
+                @if (selectedStatus.HasValue)
+                {
+                    <a asp-action="Index"
+                       class="btn btn-outline-secondary ms-1">
+                        Clear
+                    </a>
+                }
+            </div>
+        </form>
+    </div>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="card border-0 shadow-sm">
+        <div class="card-body text-center py-5">
+            <h2 class="h5">No inquiries found</h2>
+            <p class="text-muted mb-0">
+                There are no inquiries matching the selected filter.
+            </p>
+        </div>
+    </div>
+}
+else
+{
+    <div class="card border-0 shadow-sm">
+        <div class="table-responsive">
+            <table class="table align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-3">Date</th>
+                        <th>Name</th>
+                        <th>Organisation</th>
+                        <th>Subject</th>
+                        <th>Contact</th>
+                        <th>Status</th>
+                        <th class="text-end pe-3">Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                @foreach (var inquiry in Model)
+                {
+                    <tr>
+                        <td class="ps-3">
+                            <div class="fw-semibold">
+                                @inquiry.CreatedDate.ToLocalTime().ToString("dd MMM yyyy")
+                            </div>
+                            <div class="small text-muted">
+                                @inquiry.CreatedDate.ToLocalTime().ToString("HH:mm")
+                            </div>
+                        </td>
+
+                        <td>
+                            <div class="fw-semibold">
+                                @inquiry.Name
+                            </div>
+                        </td>
+
+                        <td>
+                            @if (!string.IsNullOrWhiteSpace(inquiry.OrganizationName))
+                            {
+                                @inquiry.OrganizationName
+                            }
+                            else
+                            {
+                                <span class="text-muted">Website visitor</span>
+                            }
+                        </td>
+
+                        <td>
+                            <div class="fw-semibold">
+                                @(string.IsNullOrWhiteSpace(inquiry.Subject)
+                                    ? "General enquiry"
+                                    : inquiry.Subject)
+                            </div>
+
+                            <div class="small text-muted">
+                                @inquiry.MessagePreview
+                            </div>
+                        </td>
+
+                        <td>
+                            @if (!string.IsNullOrWhiteSpace(inquiry.Email))
+                            {
+                                <div>
+                                    <a href="mailto:@inquiry.Email">
+                                        @inquiry.Email
+                                    </a>
+                                </div>
+                            }
+
+                            @if (!string.IsNullOrWhiteSpace(inquiry.Phone))
+                            {
+                                <div class="small text-muted">
+                                    @inquiry.Phone
+                                </div>
+                            }
+                        </td>
+
+                        <td>
+                            @switch (inquiry.Status)
+                            {
+                                case EnquiryStatus.New:
+                                    <span class="badge bg-primary">New</span>
+                                    break;
+
+                                case EnquiryStatus.InProgress:
+                                    <span class="badge bg-warning text-dark">In Progress</span>
+                                    break;
+
+                                case EnquiryStatus.Resolved:
+                                    <span class="badge bg-success">Resolved</span>
+                                    break;
+                            }
+                        </td>
+
+                        <td class="text-end pe-3">
+                            <a asp-action="Details"
+                               asp-route-id="@inquiry.EnquiryId"
+                               class="btn btn-sm btn-outline-primary">
+                                Open
+                            </a>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

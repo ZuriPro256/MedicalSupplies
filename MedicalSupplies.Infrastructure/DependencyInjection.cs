@@ -21,7 +21,15 @@ public static class DependencyInjection
         IConfiguration configuration)
     {
         services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
+            options.UseNpgsql(
+                configuration.GetConnectionString("DefaultConnection"),
+                npgsqlOptions =>
+                {
+                    npgsqlOptions.EnableRetryOnFailure(
+                        maxRetryCount: 5,
+                        maxRetryDelay: TimeSpan.FromSeconds(10),
+                        errorCodesToAdd: null);
+                }));
 
         services.AddIdentity<ApplicationUser, IdentityRole>(options =>
             {

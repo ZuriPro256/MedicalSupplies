@@ -17,11 +17,13 @@ public class OrderDetailsViewModel
     public List<OrderLineViewModel> Lines { get; set; } = new();
     public decimal Subtotal { get; set; }
     public decimal Discount { get; set; }
+    public decimal DeliveryCost { get; set; }
     public decimal TotalAmount { get; set; }
 
     public OrderStatus OrderStatus { get; set; }
     public PaymentStatus PaymentStatus { get; set; }
     public decimal AmountPaid { get; set; }
+    public decimal Balance => Math.Max(0, TotalAmount - AmountPaid);
     public string? DeliveryNotes { get; set; }
     public DateTime? DispatchedDate { get; set; }
     public DateTime? DeliveredDate { get; set; }

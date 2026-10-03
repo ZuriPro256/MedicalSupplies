@@ -33,7 +33,11 @@ public class HomeController : Controller
             CategoryName = p.Category.CategoryName,
             BrandName = p.Brand?.BrandName,
             PackSize = p.PackSize,
-            InStock = !p.RequiresBatchTracking || p.Batches.Any(b => b.Status == Core.Enums.BatchStatus.Active && b.QuantityAvailable > 0)
+            InStock = !p.RequiresBatchTracking || p.Batches.Any(b =>
+                b.Status == Core.Enums.BatchStatus.Active &&
+                b.QuantityAvailable > 0 &&
+                (!b.ExpiryDate.HasValue ||
+                 b.ExpiryDate.Value >= DateOnly.FromDateTime(DateTime.UtcNow.AddHours(3))))
         }).ToList();
 
         return View(vm);

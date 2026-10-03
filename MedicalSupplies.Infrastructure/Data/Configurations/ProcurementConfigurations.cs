@@ -31,6 +31,8 @@ public class PurchaseOrderConfiguration : IEntityTypeConfiguration<PurchaseOrder
         builder.Property(po => po.DeliveryCost).HasColumnType("decimal(18,2)");
         builder.Property(po => po.TaxAmount).HasColumnType("decimal(18,2)");
         builder.Property(po => po.TotalAmount).HasColumnType("decimal(18,2)");
+        builder.Property(po => po.AmountPaid).HasColumnType("decimal(18,2)");
+        builder.HasCheckConstraint("CK_PurchaseOrders_AmountPaid_Valid", "\"AmountPaid\" >= 0 AND \"AmountPaid\" <= \"TotalAmount\"");
         builder.Property(po => po.Currency).IsRequired().HasMaxLength(10);
         builder.Property(po => po.Notes).HasMaxLength(1000);
         builder.Property(po => po.CreatedBy).HasMaxLength(450);
@@ -62,5 +64,28 @@ public class PurchaseOrderDetailConfiguration : IEntityTypeConfiguration<Purchas
             .WithMany()
             .HasForeignKey(d => d.ProductId)
             .OnDelete(DeleteBehavior.Restrict);
+    }
+}
+
+public class PurchaseOrderStatusHistoryConfiguration : IEntityTypeConfiguration<PurchaseOrderStatusHistory>
+{
+    public void Configure(EntityTypeBuilder<PurchaseOrderStatusHistory> builder)
+    {
+        builder.Property(h => h.Status)
+            .HasConversion<string>()
+            .HasMaxLength(30);
+
+        builder.Property(h => h.ChangedBy)
+            .HasMaxLength(450);
+
+        builder.Property(h => h.Notes)
+            .HasMaxLength(500);
+
+        builder.HasIndex(h => new { h.PurchaseOrderId, h.ChangedDate });
+
+        builder.HasOne(h => h.PurchaseOrder)
+            .WithMany(po => po.StatusHistory)
+            .HasForeignKey(h => h.PurchaseOrderId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

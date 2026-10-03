@@ -1,0 +1,89 @@
+@model IEnumerable<MedicalSupplies.Core.Entities.Notification>
+
+@{
+    ViewData["Title"] = "Updates";
+}
+
+<div class="container py-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <h2 class="mb-1">Updates</h2>
+            <p class="text-muted mb-0">
+                Important updates from your business account.
+            </p>
+        </div>
+
+        @if (Model.Any(n => !n.IsRead))
+        {
+            <form asp-action="MarkAllNotificationsRead"
+                  method="post"
+                  class="d-inline">
+                @Html.AntiForgeryToken()
+
+                <button type="submit"
+                        class="btn btn-outline-secondary">
+                    Mark all as read
+                </button>
+            </form>
+        }
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center py-5">
+                <h5 class="mb-2">No updates yet</h5>
+                <p class="text-muted mb-0">
+                    Important quotation, order and account updates will appear here.
+                </p>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="list-group shadow-sm">
+
+            @foreach (var notification in Model)
+            {
+                <form asp-action="OpenNotification"
+                      asp-route-id="@notification.NotificationId"
+                      method="post"
+                      class="list-group-item list-group-item-action p-0">
+                    @Html.AntiForgeryToken()
+
+                    <button type="submit"
+                            class="w-100 border-0 bg-transparent text-start p-3">
+
+                        <div class="d-flex justify-content-between align-items-start gap-3">
+                            <div class="flex-grow-1">
+
+                                <div class="d-flex align-items-center gap-2 mb-1">
+                                    <strong class="@(notification.IsRead ? "" : "fw-bold")">
+                                        @notification.Title
+                                    </strong>
+
+                                    @if (!notification.IsRead)
+                                    {
+                                        <span class="badge bg-danger rounded-pill">
+                                            New
+                                        </span>
+                                    }
+                                </div>
+
+                                <div class="text-muted">
+                                    @notification.Message
+                                </div>
+                            </div>
+
+                            <small class="text-muted text-nowrap">
+                                @notification.CreatedDate.ToLocalTime().ToString("dd MMM yyyy, HH:mm")
+                            </small>
+                        </div>
+
+                    </button>
+                </form>
+            }
+
+        </div>
+    }
+</div>

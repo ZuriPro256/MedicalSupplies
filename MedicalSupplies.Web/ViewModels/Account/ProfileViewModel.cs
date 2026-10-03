@@ -15,7 +15,10 @@ public class ProfileViewModel
 
     public string Email { get; set; } = string.Empty;
 
-    [Required, Phone]
+    [Required, Display(Name = "Country")]
+    public string CountryCode { get; set; } = "UG";
+
+    [Required, StringLength(50), Display(Name = "Phone Number")]
     public string? Phone { get; set; }
 
     [StringLength(300)]

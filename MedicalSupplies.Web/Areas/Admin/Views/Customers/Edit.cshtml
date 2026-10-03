@@ -1,0 +1,190 @@
+@model MedicalSupplies.Web.ViewModels.Admin.Customers.CustomerEditViewModel
+
+@{
+    ViewData["Title"] = "Edit Customer";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="mb-1">Edit Customer</h1>
+        <p class="text-muted mb-0">
+            Update customer and organization information.
+        </p>
+    </div>
+
+    <a asp-action="Details"
+       asp-route-id="@Model.CustomerId"
+       class="btn btn-outline-secondary">
+        Cancel
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-body">
+
+                <div asp-validation-summary="ModelOnly"
+                     class="alert alert-danger"></div>
+
+                <form asp-action="Edit" method="post">
+
+                    @Html.AntiForgeryToken()
+
+                    <input type="hidden" asp-for="CustomerId" />
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+                            <label asp-for="FirstName"
+                                   class="form-label"></label>
+                            <input asp-for="FirstName"
+                                   class="form-control"
+                                   placeholder="e.g. Brenda" />
+                            <span asp-validation-for="FirstName"
+                                  class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="LastName"
+                                   class="form-label"></label>
+                            <input asp-for="LastName"
+                                   class="form-control"
+                                   placeholder="e.g. Khemiteto" />
+                            <span asp-validation-for="LastName"
+                                  class="text-danger"></span>
+                        </div>
+
+                        <div class="col-12">
+                            <label asp-for="OrganizationName"
+                                   class="form-label"></label>
+                            <input asp-for="OrganizationName"
+                                   class="form-control"
+                                   placeholder="e.g. MEDEVAX MEDICAL SOLUTIONS" />
+                            <span asp-validation-for="OrganizationName"
+                                  class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="CustomerType"
+                                   class="form-label"></label>
+                            <select asp-for="CustomerType"
+                                    asp-items="Html.GetEnumSelectList<MedicalSupplies.Core.Enums.CustomerType>()"
+                                    class="form-select">
+                            </select>
+                            <span asp-validation-for="CustomerType"
+                                  class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="Email"
+                                   class="form-label"></label>
+                            <input asp-for="Email"
+                                   class="form-control"
+                                   type="email" />
+                            <span asp-validation-for="Email"
+                                  class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="CountryCode"
+                                   class="form-label">
+                                Phone Country
+                            </label>
+
+                            <select asp-for="CountryCode"
+                                    class="form-select"
+                                    autocomplete="country">
+                                @foreach (var country in ViewBag.PhoneCountries)
+                                {
+                                    <option value="@country.Code">
+                                        @country.Name (+@country.CallingCode)
+                                    </option>
+                                }
+                            </select>
+
+                            <span asp-validation-for="CountryCode"
+                                  class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="Phone"
+                                   class="form-label">
+                                Phone Number
+                            </label>
+
+                            <input asp-for="Phone"
+                                   class="form-control"
+                                   autocomplete="tel-national"
+                                   type="tel"
+                                   inputmode="tel"
+                                   placeholder="e.g. 0784342185" />
+
+                            <div class="form-text">
+                                Enter the national number only. Do not enter
+                                the country calling code.
+                            </div>
+
+                            <span asp-validation-for="Phone"
+                                  class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="City"
+                                   class="form-label"></label>
+                            <input asp-for="City"
+                                   class="form-control" />
+                            <span asp-validation-for="City"
+                                  class="text-danger"></span>
+                        </div>
+
+                        <div class="col-12">
+                            <label asp-for="Address"
+                                   class="form-label"></label>
+                            <textarea asp-for="Address"
+                                      class="form-control"
+                                      rows="3"></textarea>
+                            <span asp-validation-for="Address"
+                                  class="text-danger"></span>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="form-check">
+                                <input asp-for="IsActive"
+                                       class="form-check-input" />
+                                <label asp-for="IsActive"
+                                       class="form-check-label"></label>
+                            </div>
+                            <div class="form-text">
+                                This controls the customer record status.
+                                It does not disable an existing login account.
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <hr class="my-4" />
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <a asp-action="Details"
+                           asp-route-id="@Model.CustomerId"
+                           class="btn btn-outline-secondary">
+                            Cancel
+                        </a>
+
+                        <button type="submit"
+                                class="btn btn-primary">
+                            Save Changes
+                        </button>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

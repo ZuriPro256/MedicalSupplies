@@ -9,29 +9,86 @@
 <div class="row mb-4">
     <div class="col-md-6">
         <h5>Customer</h5>
-        <p class="mb-1">@Model.OrganizationName @Model.CustomerName</p>
-        <p class="text-muted mb-1">@Model.CustomerPhone @(Model.CustomerEmail is not null ? "· " + Model.CustomerEmail : "")</p>
-        <p class="text-muted">Delivery: @Model.DeliveryLocation</p>
-        <p class="text-muted">Placed @Model.OrderDate.ToLocalTime().ToString("dd MMM yyyy, HH:mm")</p>
+
+        @if (!string.IsNullOrWhiteSpace(Model.OrganizationName))
+        {
+            <div class="mb-2">
+                <div class="text-muted small">Account / Organization</div>
+                <div class="fw-semibold">@Model.OrganizationName</div>
+            </div>
+        }
+
+        <div class="mb-2">
+            <div class="text-muted small">Contact Person</div>
+            <div>@Model.CustomerName</div>
+        </div>
+
+        <div class="mb-2">
+            <div class="text-muted small">Contact</div>
+            <div>
+                @if (!string.IsNullOrWhiteSpace(Model.CustomerPhone))
+                {
+                    <span>@Model.CustomerPhone</span>
+                }
+                @if (!string.IsNullOrWhiteSpace(Model.CustomerPhone) && !string.IsNullOrWhiteSpace(Model.CustomerEmail))
+                {
+                    <span> · </span>
+                }
+                @if (!string.IsNullOrWhiteSpace(Model.CustomerEmail))
+                {
+                    <span>@Model.CustomerEmail</span>
+                }
+            </div>
+        </div>
+
+        <div class="mb-2">
+            <div class="text-muted small">Delivery</div>
+            <div>@Model.DeliveryLocation</div>
+        </div>
+
+        <div class="text-muted small">
+            Placed @Model.OrderDate.ToLocalTime().ToString("dd MMM yyyy, HH:mm")
+        </div>
     </div>
 </div>
 
 <table class="table bg-white">
-    <thead><tr><th>Product</th><th>Qty</th><th>Total</th></tr></thead>
+    <thead>
+        <tr>
+            <th>Product</th>
+            <th class="text-end">Qty</th>
+            <th class="text-end">Unit Price</th>
+            <th class="text-end">Total</th>
+        </tr>
+    </thead>
     <tbody>
     @foreach (var line in Model.Lines)
     {
         <tr>
             <td>@line.ProductName</td>
-            <td>@line.Quantity</td>
-            <td>UGX @line.TotalPrice.ToString("N0")</td>
+            <td class="text-end">@line.Quantity</td>
+            <td class="text-end">UGX @line.UnitPrice.ToString("N0")</td>
+            <td class="text-end">UGX @line.TotalPrice.ToString("N0")</td>
         </tr>
     }
     </tbody>
     <tfoot>
-        <tr><td colspan="2" class="text-end">Subtotal</td><td>UGX @Model.Subtotal.ToString("N0")</td></tr>
-        <tr><td colspan="2" class="text-end">Discount</td><td>UGX @Model.Discount.ToString("N0")</td></tr>
-        <tr class="fw-bold"><td colspan="2" class="text-end">TOTAL</td><td>UGX @Model.TotalAmount.ToString("N0")</td></tr>
+        <tr>
+            <td colspan="3" class="text-end">Subtotal</td>
+            <td class="text-end">UGX @Model.Subtotal.ToString("N0")</td>
+        </tr>
+        <tr>
+            <td colspan="3" class="text-end">Discount</td>
+            <td class="text-end">UGX @Model.Discount.ToString("N0")</td>
+        </tr>
+        <tr>
+            <td colspan="3" class="text-end">Delivery / Transport</td>
+            <td class="text-end">UGX @Model.DeliveryCost.ToString("N0")</td>
+        </tr>
+        <tr class="fw-bold">
+            <td colspan="3" class="text-end">TOTAL</td>
+            <td class="text-end">UGX @Model.TotalAmount.ToString("N0")</td>
+        </tr>
     </tfoot>
 </table>
 
@@ -70,7 +127,24 @@
 
     <div class="col-md-6">
         <h5>Payment</h5>
-        <p>Status: <span class="badge bg-light text-dark">@Model.PaymentStatus</span> · Paid so far: UGX @Model.AmountPaid.ToString("N0") of UGX @Model.TotalAmount.ToString("N0")</p>
+        <div class="mb-3">
+            <div class="d-flex justify-content-between">
+                <span>Status</span>
+                <span class="badge bg-light text-dark">@Model.PaymentStatus</span>
+            </div>
+            <div class="d-flex justify-content-between">
+                <span>Total</span>
+                <strong>UGX @Model.TotalAmount.ToString("N0")</strong>
+            </div>
+            <div class="d-flex justify-content-between">
+                <span>Paid</span>
+                <strong>UGX @Model.AmountPaid.ToString("N0")</strong>
+            </div>
+            <div class="d-flex justify-content-between border-top mt-2 pt-2">
+                <span>Balance</span>
+                <strong>UGX @Model.Balance.ToString("N0")</strong>
+            </div>
+        </div>
 
         <form asp-action="UpdatePayment" asp-route-id="@Model.OrderId" method="post" class="d-flex gap-2 align-items-end flex-wrap">
             <div>

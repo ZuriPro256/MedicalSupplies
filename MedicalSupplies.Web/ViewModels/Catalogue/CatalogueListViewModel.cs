@@ -1,3 +1,5 @@
+using MedicalSupplies.Core.Enums;
+
 namespace MedicalSupplies.Web.ViewModels.Catalogue;
 
 public class CatalogueListViewModel
@@ -22,5 +24,13 @@ public class CatalogueProductCardViewModel
     public string CategoryName { get; set; } = string.Empty;
     public string? BrandName { get; set; }
     public string? PackSize { get; set; }
+
+    public ProductAvailability Availability { get; set; }
+
     public bool InStock { get; set; }
+
+    public decimal? SellingPrice { get; set; }
+    public decimal? SalePrice { get; set; }
+    public bool IsOnSale { get; set; }
+    public decimal? DisplayPrice => IsOnSale ? SalePrice : SellingPrice;
 }

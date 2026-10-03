@@ -31,19 +31,41 @@ public class QuotationConfiguration : IEntityTypeConfiguration<Quotation>
 {
     public void Configure(EntityTypeBuilder<Quotation> builder)
     {
-        builder.Property(q => q.QuotationNumber).IsRequired().HasMaxLength(50);
-        builder.HasIndex(q => q.QuotationNumber).IsUnique();
-        builder.Property(q => q.DeliveryLocation).HasMaxLength(300);
-        builder.Property(q => q.CustomerNotes).HasMaxLength(1000);
-        builder.Property(q => q.Status).HasConversion<string>().HasMaxLength(30);
-        builder.Property(q => q.DiscountAmount).HasColumnType("decimal(18,2)");
-        builder.Property(q => q.TotalAmount).HasColumnType("decimal(18,2)");
-        builder.Property(q => q.AdminNotes).HasMaxLength(1000);
+        builder.Property(q => q.QuotationNumber)
+            .IsRequired()
+            .HasMaxLength(50);
+
+        builder.HasIndex(q => q.QuotationNumber)
+            .IsUnique();
+
+        builder.Property(q => q.DeliveryLocation)
+            .HasMaxLength(300);
+
+        builder.Property(q => q.CustomerNotes)
+            .HasMaxLength(1000);
+
+        builder.Property(q => q.Status)
+            .HasConversion<string>()
+            .HasMaxLength(30);
+
+        builder.Property(q => q.DiscountAmount)
+            .HasColumnType("decimal(18,2)");
+
+        builder.Property(q => q.TotalAmount)
+            .HasColumnType("decimal(18,2)");
+
+        builder.Property(q => q.AdminNotes)
+            .HasMaxLength(1000);
 
         builder.HasOne(q => q.Customer)
             .WithMany(c => c.Quotations)
             .HasForeignKey(q => q.CustomerId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(q => q.AcceptedOffer)
+            .WithMany()
+            .HasForeignKey(q => q.AcceptedOfferId)
+            .OnDelete(DeleteBehavior.SetNull);
     }
 }
 
@@ -51,8 +73,11 @@ public class QuotationDetailConfiguration : IEntityTypeConfiguration<QuotationDe
 {
     public void Configure(EntityTypeBuilder<QuotationDetail> builder)
     {
-        builder.Property(d => d.UnitPrice).HasColumnType("decimal(18,2)");
-        builder.Property(d => d.TotalPrice).HasColumnType("decimal(18,2)");
+        builder.Property(d => d.UnitPrice)
+            .HasColumnType("decimal(18,2)");
+
+        builder.Property(d => d.TotalPrice)
+            .HasColumnType("decimal(18,2)");
 
         builder.HasOne(d => d.Quotation)
             .WithMany(q => q.Details)
@@ -70,18 +95,41 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
 {
     public void Configure(EntityTypeBuilder<Order> builder)
     {
-        builder.Property(o => o.OrderNumber).IsRequired().HasMaxLength(50);
-        builder.HasIndex(o => o.OrderNumber).IsUnique();
-        builder.Property(o => o.DeliveryLocation).HasMaxLength(300);
-        builder.Property(o => o.DeliveryNotes).HasMaxLength(500);
-        builder.Property(o => o.Notes).HasMaxLength(1000);
-        builder.Property(o => o.Subtotal).HasColumnType("decimal(18,2)");
-        builder.Property(o => o.Discount).HasColumnType("decimal(18,2)");
-        builder.Property(o => o.TotalAmount).HasColumnType("decimal(18,2)");
-        builder.Property(o => o.AmountPaid).HasColumnType("decimal(18,2)");
+        builder.Property(o => o.OrderNumber)
+            .IsRequired()
+            .HasMaxLength(50);
 
-        builder.Property(o => o.OrderStatus).HasConversion<string>().HasMaxLength(30);
-        builder.Property(o => o.PaymentStatus).HasConversion<string>().HasMaxLength(30);
+        builder.HasIndex(o => o.OrderNumber)
+            .IsUnique();
+
+        builder.Property(o => o.DeliveryLocation)
+            .HasMaxLength(300);
+
+        builder.Property(o => o.DeliveryNotes)
+            .HasMaxLength(500);
+
+        builder.Property(o => o.Notes)
+            .HasMaxLength(1000);
+
+        builder.Property(o => o.Subtotal)
+            .HasColumnType("decimal(18,2)");
+
+        builder.Property(o => o.Discount)
+            .HasColumnType("decimal(18,2)");
+
+        builder.Property(o => o.TotalAmount)
+            .HasColumnType("decimal(18,2)");
+
+        builder.Property(o => o.AmountPaid)
+            .HasColumnType("decimal(18,2)");
+
+        builder.Property(o => o.OrderStatus)
+            .HasConversion<string>()
+            .HasMaxLength(30);
+
+        builder.Property(o => o.PaymentStatus)
+            .HasConversion<string>()
+            .HasMaxLength(30);
 
         builder.HasOne(o => o.Customer)
             .WithMany(c => c.Orders)
@@ -99,8 +147,11 @@ public class OrderDetailConfiguration : IEntityTypeConfiguration<OrderDetail>
 {
     public void Configure(EntityTypeBuilder<OrderDetail> builder)
     {
-        builder.Property(d => d.UnitPrice).HasColumnType("decimal(18,2)");
-        builder.Property(d => d.TotalPrice).HasColumnType("decimal(18,2)");
+        builder.Property(d => d.UnitPrice)
+            .HasColumnType("decimal(18,2)");
+
+        builder.Property(d => d.TotalPrice)
+            .HasColumnType("decimal(18,2)");
 
         builder.HasOne(d => d.Order)
             .WithMany(o => o.Details)
@@ -118,13 +169,92 @@ public class OrderStatusHistoryConfiguration : IEntityTypeConfiguration<OrderSta
 {
     public void Configure(EntityTypeBuilder<OrderStatusHistory> builder)
     {
-        builder.Property(h => h.Status).HasConversion<string>().HasMaxLength(30);
-        builder.Property(h => h.ChangedBy).HasMaxLength(450);
-        builder.Property(h => h.Notes).HasMaxLength(500);
+        builder.Property(h => h.Status)
+            .HasConversion<string>()
+            .HasMaxLength(30);
+
+        builder.Property(h => h.ChangedBy)
+            .HasMaxLength(450);
+
+        builder.Property(h => h.Notes)
+            .HasMaxLength(500);
 
         builder.HasOne(h => h.Order)
             .WithMany(o => o.StatusHistory)
             .HasForeignKey(h => h.OrderId)
             .OnDelete(DeleteBehavior.Cascade);
+    }
+}
+
+public class QuotationOfferConfiguration : IEntityTypeConfiguration<QuotationOffer>
+{
+    public void Configure(EntityTypeBuilder<QuotationOffer> builder)
+    {
+        builder.Property(o => o.OfferNumber)
+            .IsRequired()
+            .HasMaxLength(60);
+
+        builder.HasIndex(o => o.OfferNumber)
+            .IsUnique();
+
+        builder.HasIndex(o => new { o.QuotationId, o.RevisionNumber })
+            .IsUnique();
+
+        builder.Property(o => o.Status)
+            .HasConversion<string>()
+            .HasMaxLength(30);
+
+        builder.Property(o => o.DiscountAmount)
+            .HasColumnType("decimal(18,2)");
+
+        builder.Property(o => o.TotalAmount)
+            .HasColumnType("decimal(18,2)");
+
+        builder.Property(o => o.DeliveryCost)
+            .HasColumnType("decimal(18,2)")
+            .HasDefaultValue(0);
+
+        builder.Property(o => o.PreparedBy)
+            .HasMaxLength(450);
+
+        builder.Property(o => o.AdminNotes)
+            .HasMaxLength(1000);
+
+        builder.Property(o => o.RejectionReason)
+            .HasConversion<string>()
+            .HasMaxLength(50);
+
+        builder.Property(o => o.CustomerExpectedPrice)
+            .HasColumnType("decimal(18,2)");
+
+        builder.Property(o => o.CustomerRejectionComment)
+            .HasMaxLength(1000);
+
+        builder.HasOne(o => o.Quotation)
+            .WithMany(q => q.Offers)
+            .HasForeignKey(o => o.QuotationId)
+            .OnDelete(DeleteBehavior.Cascade);
+    }
+}
+
+public class QuotationOfferDetailConfiguration : IEntityTypeConfiguration<QuotationOfferDetail>
+{
+    public void Configure(EntityTypeBuilder<QuotationOfferDetail> builder)
+    {
+        builder.Property(d => d.UnitPrice)
+            .HasColumnType("decimal(18,2)");
+
+        builder.Property(d => d.TotalPrice)
+            .HasColumnType("decimal(18,2)");
+
+        builder.HasOne(d => d.QuotationOffer)
+            .WithMany(o => o.Details)
+            .HasForeignKey(d => d.QuotationOfferId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasOne(d => d.Product)
+            .WithMany()
+            .HasForeignKey(d => d.ProductId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

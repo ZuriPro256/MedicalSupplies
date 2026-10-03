@@ -25,11 +25,16 @@ public class OrdersController : Controller
 
     private readonly ApplicationDbContext _context;
     private readonly IOrderFulfillmentService _fulfillment;
+    private readonly ICustomerNotificationService _customerNotificationService;
 
-    public OrdersController(ApplicationDbContext context, IOrderFulfillmentService fulfillment)
+    public OrdersController(
+        ApplicationDbContext context,
+        IOrderFulfillmentService fulfillment,
+        ICustomerNotificationService customerNotificationService)
     {
         _context = context;
         _fulfillment = fulfillment;
+        _customerNotificationService = customerNotificationService;
     }
 
     public async Task<IActionResult> Index(OrderFilterViewModel filter)
@@ -96,61 +101,124 @@ public class OrdersController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> ChangeStatus(int id, OrderStatus newStatus, string? notes)
     {
-        var order = await LoadOrderAsync(id);
-        if (order is null) return NotFound();
+        var strategy = _context.Database.CreateExecutionStrategy();
 
-        if (!AllowedTransitions.TryGetValue(order.OrderStatus, out var allowed) || !allowed.Contains(newStatus))
+        return await strategy.ExecuteAsync<IActionResult>(async () =>
         {
-            TempData["Error"] = $"Can't move an order from {order.OrderStatus} to {newStatus}.";
-            return RedirectToAction(nameof(Details), new { id });
-        }
+            await using var transaction = await _context.Database.BeginTransactionAsync();
 
-        var changedBy = User.Identity?.IsAuthenticated == true ? User.Identity!.Name : null;
-
-        // Stock is deducted here — the moment fulfilment is confirmed — never at
-        // quotation creation and never at order creation, so an order that's
-        // still sitting at "Created" (or gets cancelled before Processing)
-        // never touches stock figures at all.
-        if (newStatus == OrderStatus.Processing)
-        {
-            var allocation = await _fulfillment.DeductStockForOrderAsync(order, changedBy);
-            if (!allocation.Success)
+            try
             {
-                TempData["Error"] = "Not enough stock to process this order: " + string.Join("; ", allocation.InsufficientProducts);
+                // Lock the order row so two staff actions cannot change the same
+                // order concurrently and both make decisions from stale status.
+                var order = await _context.Orders
+                    .FromSqlInterpolated($"""
+                        SELECT *
+                        FROM "Orders"
+                        WHERE "OrderId" = {id}
+                        FOR UPDATE
+                        """)
+                    .Include(o => o.Customer)
+                    .Include(o => o.Details)
+                        .ThenInclude(d => d.Product)
+                    .Include(o => o.StatusHistory)
+                    .FirstOrDefaultAsync();
+
+                if (order is null)
+                {
+                    await transaction.RollbackAsync();
+                    return NotFound();
+                }
+
+                if (!AllowedTransitions.TryGetValue(order.OrderStatus, out var allowed) || !allowed.Contains(newStatus))
+                {
+                    await transaction.RollbackAsync();
+                    TempData["Error"] = $"Can't move an order from {order.OrderStatus} to {newStatus}.";
+                    return RedirectToAction(nameof(Details), new { id });
+                }
+
+                var changedBy = User.Identity?.IsAuthenticated == true ? User.Identity!.Name : null;
+
+                if (newStatus == OrderStatus.Processing)
+                {
+                    var allocation = await _fulfillment.DeductStockForOrderAsync(order, changedBy);
+
+                    if (!allocation.Success)
+                    {
+                        await transaction.RollbackAsync();
+                        TempData["Error"] = "Not enough stock to process this order: " +
+                            string.Join("; ", allocation.InsufficientProducts);
+                        return RedirectToAction(nameof(Details), new { id });
+                    }
+                }
+                else if (newStatus == OrderStatus.Cancelled && order.OrderStatus == OrderStatus.Processing)
+                {
+                    await _fulfillment.ReverseStockForOrderAsync(order, changedBy);
+                }
+
+                if (newStatus == OrderStatus.Dispatched)
+                {
+                    order.DispatchedDate = DateTime.UtcNow;
+                }
+                else if (newStatus == OrderStatus.Delivered)
+                {
+                    order.DeliveredDate = DateTime.UtcNow;
+                }
+                else if (newStatus == OrderStatus.Cancelled)
+                {
+                    order.DeliveryNotes = notes;
+                }
+
+                order.OrderStatus = newStatus;
+
+                order.StatusHistory.Add(new OrderStatusHistory
+                {
+                    Status = newStatus,
+                    ChangedBy = changedBy,
+                    Notes = notes
+                });
+
+                await _context.SaveChangesAsync();
+
+                if (!string.IsNullOrWhiteSpace(order.Customer?.UserId))
+                {
+                    var message = newStatus switch
+                    {
+                        OrderStatus.Processing =>
+                            $"Order {order.OrderNumber} is now being processed.",
+
+                        OrderStatus.Dispatched =>
+                            $"Order {order.OrderNumber} has been dispatched.",
+
+                        OrderStatus.Delivered =>
+                            $"Order {order.OrderNumber} has been delivered.",
+
+                        OrderStatus.Cancelled =>
+                            $"Order {order.OrderNumber} has been cancelled.",
+
+                        _ =>
+                            $"Order {order.OrderNumber} status has been updated."
+                    };
+
+                    await _customerNotificationService.CreateAsync(
+                        order.Customer.UserId,
+                        "OrderStatusChanged",
+                        "Order update",
+                        message,
+                        $"/Account/OrderDetails/{order.OrderId}");
+                }
+
+                await transaction.CommitAsync();
+
+                TempData["Success"] = $"Order moved to {newStatus}.";
                 return RedirectToAction(nameof(Details), new { id });
             }
-        }
-        else if (newStatus == OrderStatus.Cancelled && order.OrderStatus == OrderStatus.Processing)
-        {
-            // Only Processing has actually deducted stock (Dispatched can't be
-            // cancelled per the allowed-transitions map above).
-            await _fulfillment.ReverseStockForOrderAsync(order, changedBy);
-        }
-
-        if (newStatus == OrderStatus.Dispatched)
-        {
-            order.DispatchedDate = DateTime.UtcNow;
-        }
-        else if (newStatus == OrderStatus.Delivered)
-        {
-            order.DeliveredDate = DateTime.UtcNow;
-        }
-        else if (newStatus == OrderStatus.Cancelled)
-        {
-            order.DeliveryNotes = notes;
-        }
-
-        order.OrderStatus = newStatus;
-        order.StatusHistory.Add(new OrderStatusHistory
-        {
-            Status = newStatus,
-            ChangedBy = changedBy,
-            Notes = notes
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
         });
-
-        await _context.SaveChangesAsync();
-        TempData["Success"] = $"Order moved to {newStatus}.";
-        return RedirectToAction(nameof(Details), new { id });
     }
 
     [HttpPost]
@@ -194,6 +262,7 @@ public class OrdersController : Controller
         }).ToList(),
         Subtotal = order.Subtotal,
         Discount = order.Discount,
+        DeliveryCost = order.DeliveryCost,
         TotalAmount = order.TotalAmount,
         OrderStatus = order.OrderStatus,
         PaymentStatus = order.PaymentStatus,

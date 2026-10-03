@@ -2,7 +2,21 @@
 @{ ViewData["Title"] = $"PO {Model.PurchaseOrderNumber}"; }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h1>Purchase Order @Model.PurchaseOrderNumber</h1>
+    <div class="d-flex align-items-center gap-2">
+        <h1 class="mb-0">Purchase Order @Model.PurchaseOrderNumber</h1>
+
+        @if (Model.Status is
+            MedicalSupplies.Core.Enums.PurchaseOrderStatus.PartiallyReceived or
+            MedicalSupplies.Core.Enums.PurchaseOrderStatus.Received)
+        {
+            <a asp-action="Return"
+               asp-route-id="@Model.PurchaseOrderId"
+               class="btn btn-warning">
+                Return Goods
+            </a>
+        }
+    </div>
+
     <span class="badge bg-secondary fs-6">@Model.Status</span>
 </div>
 
@@ -81,19 +95,341 @@
         {
             <p class="text-muted small">No further status changes available.</p>
         }
+
+        @if (
+            Model.AmountPaid <= 0 &&
+            Model.Status is
+                MedicalSupplies.Core.Enums.PurchaseOrderStatus.Draft or
+                MedicalSupplies.Core.Enums.PurchaseOrderStatus.Submitted or
+                MedicalSupplies.Core.Enums.PurchaseOrderStatus.Approved)
+        {
+            <div class="mt-3 p-3 border rounded bg-light">
+                <h6 class="mb-2">Cancel Purchase Order</h6>
+
+                <form asp-action="Cancel"
+                      asp-route-id="@Model.PurchaseOrderId"
+                      method="post"
+                      onsubmit="return confirm('Are you sure you want to cancel this purchase order? This action can only be reversed by an authorized administrator.');">
+
+                    <div class="mb-2">
+                        <label for="cancellationReason" class="form-label">
+                            Cancellation reason
+                        </label>
+                        <textarea id="cancellationReason"
+                                  name="cancellationReason"
+                                  class="form-control form-control-sm"
+                                  rows="2"
+                                  maxlength="500"
+                                  required
+                                  placeholder="Enter the reason for cancelling this purchase order"></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                        Cancel Purchase Order
+                    </button>
+                </form>
+            </div>
+        }
+
+        @if (Model.Status == MedicalSupplies.Core.Enums.PurchaseOrderStatus.Cancelled &&
+             Model.AmountPaid <= 0 &&
+             (User.IsInRole("SuperAdmin") || User.IsInRole("Admin")))
+        {
+            <div class="mt-3 p-3 border rounded bg-warning-subtle">
+                <h6 class="mb-2">Restore Purchase Order</h6>
+                <p class="small text-muted mb-2">
+                    This will restore the purchase order to the status it had immediately before cancellation.
+                </p>
+
+                <form asp-action="Restore"
+                      asp-route-id="@Model.PurchaseOrderId"
+                      method="post"
+                      onsubmit="return confirm('Restore this purchase order to its previous status?');">
+                    <button type="submit" class="btn btn-sm btn-outline-primary">
+                        Restore Purchase Order
+                    </button>
+                </form>
+            </div>
+        }
+
+        @if (Model.StatusHistory.Any())
+        {
+            <h6 class="mt-4">Status History</h6>
+
+            <div class="table-responsive">
+                <table class="table table-sm table-bordered align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Changed By</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var history in Model.StatusHistory)
+                        {
+                            <tr>
+                                <td>@history.ChangedDate.ToLocalTime().ToString("dd MMM yyyy HH:mm")</td>
+                                <td>
+                                    <span class="badge bg-secondary">@history.Status</span>
+                                </td>
+                                <td>@(string.IsNullOrWhiteSpace(history.ChangedBy) ? "-" : history.ChangedBy)</td>
+                                <td>@(string.IsNullOrWhiteSpace(history.Notes) ? "-" : history.Notes)</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+
+        @if (Model.Returns.Any())
+        {
+            <h6 class="mt-4">Goods Returns</h6>
+
+            @foreach (var returnRecord in Model.Returns)
+            {
+                <div class="card mb-3 border-warning">
+                    <div class="card-header bg-light">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <strong>@returnRecord.ReturnNumber</strong>
+                            <span>@returnRecord.ReturnDate.ToLocalTime().ToString("dd MMM yyyy HH:mm")</span>
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="small mb-3">
+                            <div>
+                                <strong>Reason:</strong>
+                                @returnRecord.Reason
+                            </div>
+                            <div>
+                                <strong>Recorded By:</strong>
+                                @(string.IsNullOrWhiteSpace(returnRecord.RecordedBy) ? "-" : returnRecord.RecordedBy)
+                            </div>
+
+                            @if (!string.IsNullOrWhiteSpace(returnRecord.Notes))
+                            {
+                                <div>
+                                    <strong>Notes:</strong>
+                                    @returnRecord.Notes
+                                </div>
+                            }
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-sm table-bordered align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Product</th>
+                                        <th>Batch</th>
+                                        <th>Qty Returned</th>
+                                        <th>Unit Cost</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var detail in returnRecord.Details)
+                                    {
+                                        <tr>
+                                            <td>@detail.ProductName</td>
+                                            <td>@(string.IsNullOrWhiteSpace(detail.BatchNumber) ? "-" : detail.BatchNumber)</td>
+                                            <td>@detail.QuantityReturned</td>
+                                            <td>@Model.Currency @detail.UnitCost.ToString("N0")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
     </div>
     <div class="col-md-6">
         <h5>Payment to Supplier</h5>
-        <p><span class="badge bg-light text-dark">@Model.PaymentStatus</span></p>
-        <form asp-action="UpdatePayment" asp-route-id="@Model.PurchaseOrderId" method="post" class="d-flex gap-2">
-            <select name="paymentStatus" class="form-select form-select-sm">
-                @foreach (var status in Enum.GetValues<MedicalSupplies.Core.Enums.PaymentStatus>())
-                {
-                    <option value="@status" selected="@(status == Model.PaymentStatus)">@status</option>
-                }
-            </select>
-            <button type="submit" class="btn btn-sm btn-outline-primary">Save</button>
-        </form>
+
+        <p>
+            Status:
+            <span class="badge bg-light text-dark">@Model.PaymentStatus</span>
+        </p>
+
+        <div class="small mb-3">
+            <div><strong>Total:</strong> @Model.Currency @Model.TotalAmount.ToString("N0")</div>
+            <div><strong>Paid:</strong> @Model.Currency @Model.AmountPaid.ToString("N0")</div>
+            <div>
+                <strong>Balance:</strong>
+                @Model.Currency @((Model.TotalAmount - Model.AmountPaid).ToString("N0"))
+            </div>
+        </div>
+
+        @if (Model.SupplierPayments.Any())
+        {
+            <h6 class="mt-4">Payment History</h6>
+            <div class="table-responsive mb-4">
+                <table class="table table-sm table-bordered align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Date</th>
+                            <th>Amount</th>
+                            <th>Method</th>
+                            <th>Reference</th>
+                            <th>Recorded By</th>
+                            <th>Status / Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var payment in Model.SupplierPayments)
+                        {
+                            <tr class="@(payment.IsReversed ? "table-secondary" : "")">
+                                <td>@payment.PaymentDate.ToLocalTime().ToString("dd MMM yyyy HH:mm")</td>
+                                <td>@Model.Currency @payment.Amount.ToString("N0")</td>
+                                <td>@payment.PaymentMethod</td>
+                                <td>@(string.IsNullOrWhiteSpace(payment.ReferenceNumber) ? "-" : payment.ReferenceNumber)</td>
+                                <td>@(string.IsNullOrWhiteSpace(payment.RecordedBy) ? "-" : payment.RecordedBy)</td>
+                                <td>
+                                    @if (payment.IsReversed)
+                                    {
+                                        <span class="badge bg-warning text-dark">Reversed</span>
+                                    }
+                                    else if (User.IsInRole("SuperAdmin"))
+                                    {
+                                        <form asp-action="ReversePayment"
+                                              asp-route-id="@Model.PurchaseOrderId"
+                                              method="post"
+                                              class="d-inline"
+                                              onsubmit="return confirm('Reverse this supplier payment? This action will be recorded in the audit history.');">
+                                            <input type="hidden" name="paymentId" value="@payment.SupplierPaymentId" />
+                                            <input type="text"
+                                                   name="reversalReason"
+                                                   class="form-control form-control-sm mb-1"
+                                                   maxlength="1000"
+                                                   placeholder="Reason for reversal"
+                                                   required />
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                Reverse
+                                            </button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted small">Recorded</span>
+                                    }
+                                </td>
+                            </tr>
+
+                            @if (!string.IsNullOrWhiteSpace(payment.Notes))
+                            {
+                                <tr class="table-light">
+                                    <td colspan="6" class="small">
+                                        <strong>Note:</strong> @payment.Notes
+                                    </td>
+                                </tr>
+                            }
+
+                            @if (payment.IsReversed)
+                            {
+                                <tr class="table-warning">
+                                    <td colspan="6" class="small">
+                                        <strong>Reversal reason:</strong>
+                                        @(string.IsNullOrWhiteSpace(payment.ReversalReason) ? "-" : payment.ReversalReason)
+                                        <br />
+                                        <strong>Reversed by:</strong>
+                                        @(string.IsNullOrWhiteSpace(payment.ReversedBy) ? "-" : payment.ReversedBy)
+                                        <br />
+                                        <strong>Reversed on:</strong>
+                                        @(payment.ReversedDate.HasValue
+                                            ? payment.ReversedDate.Value.ToLocalTime().ToString("dd MMM yyyy HH:mm")
+                                            : "-")
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+
+        @if (Model.Status != MedicalSupplies.Core.Enums.PurchaseOrderStatus.Cancelled && Model.TotalAmount > Model.AmountPaid)
+        {
+            <h6 class="mt-4">Record Payment</h6>
+
+            <form asp-action="RecordPayment" asp-route-id="@Model.PurchaseOrderId" method="post">
+                <div class="row g-2">
+                    <div class="col-md-6">
+                        <label for="paymentAmount" class="form-label small">Payment Amount</label>
+                        <input type="number"
+                               id="paymentAmount"
+                               name="paymentAmount"
+                               min="0.01"
+                               max="@((Model.TotalAmount - Model.AmountPaid).ToString("0.00", System.Globalization.CultureInfo.InvariantCulture))"
+                               step="0.01"
+                               class="form-control form-control-sm"
+                               required />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="paymentDate" class="form-label small">Payment Date</label>
+                        <input type="datetime-local"
+                               id="paymentDate"
+                               name="paymentDate"
+                               value="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")"
+                               class="form-control form-control-sm"
+                               required />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="paymentMethod" class="form-label small">Payment Method</label>
+                        <select id="paymentMethod"
+                                name="paymentMethod"
+                                class="form-select form-select-sm"
+                                required>
+                            <option value="">Select method</option>
+                            <option value="Bank Transfer">Bank Transfer</option>
+                            <option value="Mobile Money">Mobile Money</option>
+                            <option value="Cash">Cash</option>
+                            <option value="Cheque">Cheque</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="referenceNumber" class="form-label small">Reference Number</label>
+                        <input type="text"
+                               id="referenceNumber"
+                               name="referenceNumber"
+                               maxlength="100"
+                               class="form-control form-control-sm"
+                               placeholder="Transaction / cheque reference" />
+                    </div>
+
+                    <div class="col-12">
+                        <label for="notes" class="form-label small">Notes</label>
+                        <textarea id="notes"
+                                  name="notes"
+                                  maxlength="1000"
+                                  rows="2"
+                                  class="form-control form-control-sm"
+                                  placeholder="Optional payment notes"></textarea>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-sm btn-primary mt-3">
+                    Record Payment
+                </button>
+            </form>
+        }
+        else if (Model.Status == MedicalSupplies.Core.Enums.PurchaseOrderStatus.Cancelled)
+        {
+            <div class="alert alert-secondary mt-3 mb-0">
+                No further payments can be recorded because this purchase order is cancelled.
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-success mt-3 mb-0">
+                This purchase order is fully paid.
+            </div>
+        }
     </div>
 </div>
 

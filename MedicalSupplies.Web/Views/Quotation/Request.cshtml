@@ -1,11 +1,15 @@
-@model QuotationRequestFormViewModel
-@{ ViewData["Title"] = "Request a Quotation"; }
+@model MedicalSupplies.Web.ViewModels.Catalogue.QuotationRequestFormViewModel
+
+@{
+    ViewData["Title"] = "Request a Quotation";
+}
 
 <h1>Request a Quotation</h1>
 
 <div class="row">
     <div class="col-md-5">
         <h5>Items</h5>
+
         <ul class="list-group mb-4">
             @foreach (var line in Model.Lines)
             {
@@ -15,12 +19,17 @@
                 </li>
             }
         </ul>
-        <a asp-action="Cart" class="btn btn-sm btn-outline-secondary">&larr; Edit list</a>
+
+        <a asp-action="Cart" class="btn btn-sm btn-outline-secondary">
+            &larr; Edit list
+        </a>
     </div>
 
     <div class="col-md-7">
         <form asp-action="Request" method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            @Html.AntiForgeryToken()
+
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
             <div class="mb-3">
                 <label asp-for="ContactName" class="form-label"></label>
@@ -29,21 +38,60 @@
             </div>
 
             <div class="mb-3">
-                <label asp-for="OrganizationName" class="form-label">Organization (if applicable)</label>
+                <label asp-for="OrganizationName" class="form-label">
+                    Organization (if applicable)
+                </label>
                 <input asp-for="OrganizationName" class="form-control" />
             </div>
 
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <label asp-for="Email" class="form-label"></label>
-                    <input asp-for="Email" class="form-control" />
+                    <input asp-for="Email"
+                           class="form-control"
+                           autocomplete="email"
+                           type="email" />
                     <span asp-validation-for="Email" class="text-danger"></span>
                 </div>
+
                 <div class="col-md-6 mb-3">
-                    <label asp-for="Phone" class="form-label"></label>
-                    <input asp-for="Phone" class="form-control" />
-                    <span asp-validation-for="Phone" class="text-danger"></span>
+                    <label asp-for="CountryCode" class="form-label">
+                        Phone Country
+                    </label>
+
+                    <select asp-for="CountryCode"
+                            class="form-select"
+                            autocomplete="country">
+                        @foreach (var country in ViewBag.PhoneCountries)
+                        {
+                            <option value="@country.Code">
+                                @country.Name (+@country.CallingCode)
+                            </option>
+                        }
+                    </select>
+
+                    <span asp-validation-for="CountryCode" class="text-danger"></span>
                 </div>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Phone" class="form-label">
+                    Phone Number
+                </label>
+
+                <input asp-for="Phone"
+                       class="form-control"
+                       autocomplete="tel-national"
+                       type="tel"
+                       inputmode="tel"
+                       placeholder="e.g. 0784342185" />
+
+                <div class="form-text">
+                    Enter the phone number as used in the selected country.
+                    Do not enter the country calling code.
+                </div>
+
+                <span asp-validation-for="Phone" class="text-danger"></span>
             </div>
 
             <div class="mb-3">
@@ -52,16 +100,32 @@
             </div>
 
             <div class="mb-3">
-                <label asp-for="CustomerNotes" class="form-label">Notes (optional)</label>
-                <textarea asp-for="CustomerNotes" class="form-control" rows="3"></textarea>
+                <label asp-for="CustomerNotes" class="form-label">
+                    Notes (optional)
+                </label>
+
+                <textarea asp-for="CustomerNotes"
+                          class="form-control"
+                          rows="3"></textarea>
             </div>
 
-            <button type="submit" class="btn btn-primary">Submit Quotation Request</button>
+            <button type="submit" class="btn btn-primary">
+                Submit Quotation Request
+            </button>
         </form>
 
         <p class="text-muted mt-3">
             Prefer WhatsApp? Send your product list to
-            <a href="https://wa.me/256000000000" target="_blank">our WhatsApp line</a> instead.
+            <a href="https://wa.me/256785542185"
+               target="_blank"
+               rel="noopener">
+                our WhatsApp line
+            </a>
+            instead.
         </p>
     </div>
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

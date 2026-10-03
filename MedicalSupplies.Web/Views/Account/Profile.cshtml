@@ -8,41 +8,93 @@
 
     <div class="mb-3">
         <label class="form-label">Email</label>
-        <input value="@Model.Email" class="form-control" disabled />
-        <div class="form-text">Contact us to change the email on your account.</div>
+        <input value="@Model.Email"
+               class="form-control"
+               disabled />
+        <div class="form-text">
+            Contact us to change the email on your account.
+        </div>
     </div>
 
     <div class="row">
         <div class="col-md-6 mb-3">
             <label asp-for="FirstName" class="form-label"></label>
-            <input asp-for="FirstName" class="form-control" />
+            <input asp-for="FirstName"
+                   class="form-control"
+                   autocomplete="given-name" />
+            <span asp-validation-for="FirstName" class="text-danger"></span>
         </div>
+
         <div class="col-md-6 mb-3">
             <label asp-for="LastName" class="form-label"></label>
-            <input asp-for="LastName" class="form-control" />
+            <input asp-for="LastName"
+                   class="form-control"
+                   autocomplete="family-name" />
+            <span asp-validation-for="LastName" class="text-danger"></span>
         </div>
     </div>
 
     <div class="mb-3">
         <label asp-for="OrganizationName" class="form-label"></label>
-        <input asp-for="OrganizationName" class="form-control" />
+        <input asp-for="OrganizationName"
+               class="form-control"
+               autocomplete="organization" />
+        <span asp-validation-for="OrganizationName" class="text-danger"></span>
     </div>
 
     <div class="mb-3">
-        <label asp-for="Phone" class="form-label"></label>
-        <input asp-for="Phone" class="form-control" />
+        <label asp-for="CountryCode" class="form-label">Phone Country</label>
+        <select asp-for="CountryCode"
+                class="form-select"
+                autocomplete="country">
+            @foreach (var country in ViewBag.PhoneCountries)
+            {
+                <option value="@country.Code">
+                    @country.Name (+@country.CallingCode)
+                </option>
+            }
+        </select>
+        <span asp-validation-for="CountryCode" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Phone" class="form-label">Phone Number</label>
+        <input asp-for="Phone"
+               class="form-control"
+               autocomplete="tel-national"
+               type="tel"
+               inputmode="tel"
+               placeholder="e.g. 0784342185" />
+        <div class="form-text">
+            Enter the national phone number only. Select the country above;
+            do not enter the country calling code.
+        </div>
         <span asp-validation-for="Phone" class="text-danger"></span>
     </div>
 
     <div class="mb-3">
         <label asp-for="Address" class="form-label"></label>
-        <input asp-for="Address" class="form-control" />
+        <input asp-for="Address"
+               class="form-control"
+               autocomplete="street-address" />
+        <span asp-validation-for="Address" class="text-danger"></span>
     </div>
 
     <div class="mb-3">
         <label asp-for="City" class="form-label"></label>
-        <input asp-for="City" class="form-control" />
+        <input asp-for="City"
+               class="form-control"
+               autocomplete="address-level2" />
+        <span asp-validation-for="City" class="text-danger"></span>
     </div>
 
-    <button type="submit" class="btn btn-primary">Save</button>
+    <button type="submit" class="btn btn-primary">
+        Save
+    </button>
 </form>
+
+<div class="mt-4">
+    <a asp-action="ChangePassword" class="btn btn-outline-primary">
+        Change Password
+    </a>
+</div>

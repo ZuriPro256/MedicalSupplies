@@ -1,3 +1,4 @@
+@using MedicalSupplies.Core.Enums
 @model MyQuotationDetailsViewModel
 @{ ViewData["Title"] = $"Quotation {Model.QuotationNumber}"; }
 
@@ -31,6 +32,399 @@
         <tr class="fw-bold"><td colspan="3" class="text-end">Total</td><td>@(Model.TotalAmount is null ? "—" : $"UGX {Model.TotalAmount:N0}")</td></tr>
     </tfoot>
 </table>
+
+@if (Model.Offers.Any())
+{
+    <div class="card border-primary mb-4">
+        <div class="card-header">
+            <strong>Revised Offers</strong>
+        </div>
+        <div class="card-body">
+            <p class="text-muted">
+                These are revised offers from the supplier. Only offers marked
+                <strong>Sent</strong> require your response.
+            </p>
+
+            @foreach (var offer in Model.Offers)
+            {
+                <div class="card mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>@offer.OfferNumber</strong>
+                            <span class="ms-2">Revision @offer.RevisionNumber</span>
+                        </div>
+                        <span class="badge bg-secondary">@offer.Status</span>
+                    </div>
+
+                    <div class="card-body">
+                        @if (offer.SentDate.HasValue)
+                        {
+                            <p class="text-muted mb-1">
+                                Sent @offer.SentDate.Value.ToLocalTime().ToString("dd MMM yyyy, HH:mm")
+                            </p>
+                        }
+
+                        @if (offer.ValidUntil.HasValue)
+                        {
+                            <p class="text-muted">
+                                Valid until @offer.ValidUntil.Value.ToString("dd MMM yyyy")
+                            </p>
+                        }
+
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Product</th>
+                                        <th>Qty</th>
+                                        <th class="text-end">Unit Price</th>
+                                        <th class="text-end">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                @foreach (var line in offer.Lines)
+                                {
+                                    <tr>
+                                        <td>@line.ProductName</td>
+                                        <td>@line.Quantity</td>
+                                        <td class="text-end">
+                                            @(line.UnitPrice.HasValue
+                                                ? $"UGX {line.UnitPrice.Value:N0}"
+                                                : "—")
+                                        </td>
+                                        <td class="text-end">
+                                            @(line.LineTotal.HasValue
+                                                ? $"UGX {line.LineTotal.Value:N0}"
+                                                : "—")
+                                        </td>
+                                    </tr>
+                                }
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <th colspan="3" class="text-end">Subtotal</th>
+                                        <th class="text-end">
+                                            UGX @offer.SubTotal.ToString("N0")
+                                        </th>
+                                    </tr>
+
+                                    @if (offer.DiscountAmount.HasValue && offer.DiscountAmount.Value != 0)
+                                    {
+                                        <tr>
+                                            <th colspan="3" class="text-end">Discount</th>
+                                            <th class="text-end">
+                                                UGX @offer.DiscountAmount.Value.ToString("N0")
+                                            </th>
+                                        </tr>
+                                    }
+
+                                    @if (offer.DeliveryCost != 0)
+                                    {
+                                        <tr>
+                                            <th colspan="3" class="text-end">Delivery / Transport</th>
+                                            <th class="text-end">
+                                                UGX @offer.DeliveryCost.ToString("N0")
+                                            </th>
+                                        </tr>
+                                    }
+
+                                    <tr class="fw-bold">
+                                        <th colspan="3" class="text-end">Grand Total</th>
+                                        <th class="text-end">
+                                            @(offer.TotalAmount.HasValue
+                                                ? $"UGX {offer.TotalAmount.Value:N0}"
+                                                : "—")
+                                        </th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+
+                        @if (offer.Status == QuotationOfferStatus.Sent)
+                        {
+                            <div class="border-top pt-3 mt-3">
+                                <h6>Respond to this offer</h6>
+
+                                <div class="d-flex gap-2 mb-3">
+                                    <form asp-action="AcceptOffer" method="post">
+                                        <input type="hidden"
+                                               name="id"
+                                               value="@offer.QuotationOfferId" />
+                                        <button type="submit" class="btn btn-success">
+                                            Accept This Offer
+                                        </button>
+                                    </form>
+                                </div>
+
+                                <details>
+                                    <summary class="btn btn-outline-danger">
+                                        Reject This Offer
+                                    </summary>
+
+                                    <div class="border rounded p-3 mt-3">
+                                        <form asp-action="RejectOffer" method="post">
+                                            <input type="hidden"
+                                                   name="id"
+                                                   value="@offer.QuotationOfferId" />
+
+                                            <div class="mb-3">
+                                                <label class="form-label">
+                                                    Why are you rejecting this offer?
+                                                </label>
+
+                                                <select name="rejectionReason"
+                                                        class="form-select"
+                                                        required>
+                                                    <option value="">
+                                                        -- Select a reason --
+                                                    </option>
+                                                    <option value="PriceTooHigh">
+                                                        Price is too high
+                                                    </option>
+                                                    <option value="FoundBetterPrice">
+                                                        I found a better price
+                                                    </option>
+                                                    <option value="QuantityNotSuitable">
+                                                        Quantity is not suitable
+                                                    </option>
+                                                    <option value="DeliveryIssue">
+                                                        Delivery terms/location
+                                                    </option>
+                                                    <option value="NoLongerNeeded">
+                                                        No longer needed
+                                                    </option>
+                                                    <option value="Other">
+                                                        Other
+                                                    </option>
+                                                </select>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label class="form-label">
+                                                    Expected price (UGX)
+                                                    <span class="text-muted">
+                                                        (optional)
+                                                    </span>
+                                                </label>
+
+                                                <input type="number"
+                                                       name="customerExpectedPrice"
+                                                       class="form-control"
+                                                       min="0"
+                                                       step="1"
+                                                       placeholder="e.g. 430000" />
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label class="form-label">
+                                                    Additional comments
+                                                    <span class="text-muted">
+                                                        (optional)
+                                                    </span>
+                                                </label>
+
+                                                <textarea name="customerRejectionComment"
+                                                          class="form-control"
+                                                          rows="4"
+                                                          maxlength="2000"
+                                                          placeholder="Tell us what you would like us to consider for the next revision."></textarea>
+                                            </div>
+
+                                            <button type="submit" class="btn btn-danger">
+                                                Reject This Offer
+                                            </button>
+                                        </form>
+                                    </div>
+                                </details>
+                            </div>
+                        }
+
+                        @if (offer.Status == QuotationOfferStatus.Rejected)
+                        {
+                            <div class="alert alert-warning mt-3 mb-0">
+                                <strong>You rejected this offer.</strong>
+
+                                @if (offer.CustomerExpectedPrice.HasValue)
+                                {
+                                    <div>
+                                        Expected price:
+                                        UGX @offer.CustomerExpectedPrice.Value.ToString("N0")
+                                    </div>
+                                }
+
+                                @if (!string.IsNullOrWhiteSpace(offer.CustomerRejectionComment))
+                                {
+                                    <div>
+                                        Comments: @offer.CustomerRejectionComment
+                                    </div>
+                                }
+                            </div>
+                        }
+
+                        @if (offer.Status == QuotationOfferStatus.Accepted)
+                        {
+                            <div class="alert alert-success mt-3 mb-0">
+                                <strong>This offer was accepted.</strong>
+                            </div>
+                        }
+
+                        @if (offer.Status == QuotationOfferStatus.Superseded)
+                        {
+                            <div class="alert alert-secondary mt-3 mb-0">
+                                This offer was replaced by a newer revision.
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@if (Model.Status == QuotationStatus.Rejected && Model.RejectionReason is not null)
+{
+    <div class="card border-danger mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Rejection feedback</h5>
+
+            <dl class="row mb-0">
+                <dt class="col-sm-4">Reason</dt>
+                <dd class="col-sm-8">
+                    @switch (Model.RejectionReason)
+                    {
+                        case QuotationRejectionReason.PriceTooHigh:
+                            <text>Price is too high</text>
+                            break;
+                        case QuotationRejectionReason.FoundBetterPrice:
+                            <text>I found a better price</text>
+                            break;
+                        case QuotationRejectionReason.QuantityNotSuitable:
+                            <text>Quantity is not suitable</text>
+                            break;
+                        case QuotationRejectionReason.DeliveryIssue:
+                            <text>Delivery terms/location</text>
+                            break;
+                        case QuotationRejectionReason.NoLongerNeeded:
+                            <text>No longer needed</text>
+                            break;
+                        case QuotationRejectionReason.Other:
+                            <text>Other</text>
+                            break;
+                    }
+                </dd>
+
+                @if (Model.CustomerExpectedPrice.HasValue)
+                {
+                    <dt class="col-sm-4">Expected price</dt>
+                    <dd class="col-sm-8">
+                        UGX @Model.CustomerExpectedPrice.Value.ToString("N0")
+                    </dd>
+                }
+
+                @if (!string.IsNullOrWhiteSpace(Model.CustomerRejectionComment))
+                {
+                    <dt class="col-sm-4">Comments</dt>
+                    <dd class="col-sm-8">
+                        @Model.CustomerRejectionComment
+                    </dd>
+                }
+
+                @if (Model.RejectedDate.HasValue)
+                {
+                    <dt class="col-sm-4">Rejected on</dt>
+                    <dd class="col-sm-8">
+                        @Model.RejectedDate.Value.ToLocalTime().ToString("dd MMM yyyy, HH:mm")
+                    </dd>
+                }
+            </dl>
+        </div>
+    </div>
+}
+
+@if (Model.Status == QuotationStatus.Sent)
+{
+    <div class="card border-primary mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Your response</h5>
+            <p class="card-text">
+                Please review the quotation above and choose whether you want to proceed.
+            </p>
+
+            <div class="d-flex gap-2 mb-3">
+                <form asp-action="AcceptQuotation" method="post">
+                    <input type="hidden" name="id" value="@Model.QuotationId" />
+                    <button type="submit" class="btn btn-success">
+                        Accept Quotation
+                    </button>
+                </form>
+            </div>
+
+            <details>
+                <summary class="btn btn-outline-danger">
+                    Reject Quotation
+                </summary>
+
+                <div class="border rounded p-3 mt-3">
+                    <form asp-action="RejectQuotation" method="post">
+                        <input type="hidden" name="id" value="@Model.QuotationId" />
+
+                        <div class="mb-3">
+                            <label for="rejectionReason" class="form-label">
+                                Why are you rejecting this quotation?
+                            </label>
+                            <select id="rejectionReason"
+                                    name="rejectionReason"
+                                    class="form-select"
+                                    required>
+                                <option value="">-- Select a reason --</option>
+                                <option value="PriceTooHigh">Price is too high</option>
+                                <option value="FoundBetterPrice">I found a better price</option>
+                                <option value="QuantityNotSuitable">Quantity is not suitable</option>
+                                <option value="DeliveryIssue">Delivery terms/location</option>
+                                <option value="NoLongerNeeded">No longer needed</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="customerExpectedPrice" class="form-label">
+                                Expected price (UGX)
+                                <span class="text-muted">(optional)</span>
+                            </label>
+                            <input type="number"
+                                   id="customerExpectedPrice"
+                                   name="customerExpectedPrice"
+                                   class="form-control"
+                                   min="0"
+                                   step="1"
+                                   placeholder="e.g. 450000" />
+                            <div class="form-text">
+                                If the price is the issue, tell us what price you would be comfortable with.
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="customerRejectionComment" class="form-label">
+                                Additional comments
+                                <span class="text-muted">(optional)</span>
+                            </label>
+                            <textarea id="customerRejectionComment"
+                                      name="customerRejectionComment"
+                                      class="form-control"
+                                      rows="4"
+                                      maxlength="2000"
+                                      placeholder="Tell us anything that may help us understand your decision or revise the quotation."></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-danger">
+                            Submit Rejection
+                        </button>
+                    </form>
+                </div>
+            </details>
+        </div>
+    </div>
+}
 
 @if (Model.OrderId is not null)
 {

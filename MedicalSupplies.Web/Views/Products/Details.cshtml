@@ -1,11 +1,21 @@
 @model ProductDetailsViewModel
-@{ ViewData["Title"] = Model.ProductName; }
+@using MedicalSupplies.Core.Enums
+
+@{
+    ViewData["Title"] = Model.ProductName;
+}
 
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a asp-action="Index">Products</a></li>
-        <li class="breadcrumb-item"><a asp-action="Index" asp-route-categoryId="">@Model.CategoryName</a></li>
-        <li class="breadcrumb-item active">@Model.ProductName</li>
+        <li class="breadcrumb-item">
+            <a asp-action="Index">Products</a>
+        </li>
+        <li class="breadcrumb-item">
+            <a asp-action="Index">@Model.CategoryName</a>
+        </li>
+        <li class="breadcrumb-item active">
+            @Model.ProductName
+        </li>
     </ol>
 </nav>
 
@@ -13,44 +23,93 @@
     <div class="col-md-5">
         @if (Model.ImageUrls.Any())
         {
-            <img src="@Model.ImageUrls.First()" class="img-fluid rounded border" alt="@Model.ProductName" />
+            <img src="@Model.ImageUrls.First()"
+                 class="img-fluid rounded border"
+                 alt="@Model.ProductName" />
+
             @if (Model.ImageUrls.Count > 1)
             {
                 <div class="d-flex gap-2 mt-2">
                     @foreach (var url in Model.ImageUrls.Skip(1))
                     {
-                        <img src="@url" style="width:70px; height:70px; object-fit:cover;" class="rounded border" />
+                        <img src="@url"
+                             style="width:70px; height:70px; object-fit:cover;"
+                             class="rounded border"
+                             alt="@Model.ProductName" />
                     }
                 </div>
             }
         }
         else
         {
-            <img src="/images/placeholder-product.svg" class="img-fluid rounded border" alt="@Model.ProductName" />
+            <img src="/images/placeholder-product.svg"
+                 class="img-fluid rounded border"
+                 alt="@Model.ProductName" />
         }
     </div>
 
     <div class="col-md-7">
         <h1>@Model.ProductName</h1>
+
         <p class="text-muted">
             Code: @Model.ProductCode ·
             @Model.CategoryName
-            @if (Model.BrandName is not null) { <text> · @Model.BrandName</text> }
+            @if (Model.BrandName is not null)
+            {
+                <text> · @Model.BrandName</text>
+            }
         </p>
 
-        @if (Model.InStock)
+        <div class="mb-3">
+            @switch (Model.Availability)
+            {
+                case ProductAvailability.InStock:
+                    <span class="badge bg-success">In Stock</span>
+                    break;
+
+                case ProductAvailability.AvailableOnRequest:
+                    <span class="badge bg-primary">Available on Request</span>
+                    break;
+
+                case ProductAvailability.QuotationRequired:
+                    <span class="badge bg-warning text-dark">Quotation Required</span>
+                    break;
+
+                case ProductAvailability.OutOfStock:
+                    <span class="badge bg-secondary">Out of Stock</span>
+                    break;
+
+                case ProductAvailability.ComingSoon:
+                    <span class="badge bg-info text-dark">Coming Soon</span>
+                    break;
+            }
+
+            @if (Model.IsOnSale)
+            {
+                <span class="badge bg-danger ms-1">On Sale</span>
+            }
+        </div>
+
+        <div class="alert alert-light border mb-3">
+            <strong>Pricing available by quotation.</strong>
+            <div class="small text-muted">
+                Request a quotation for the current price and availability.
+            </div>
+        </div>
+
+        @if (Model.PackSize is not null)
         {
-            <span class="badge bg-success mb-3">In Stock</span>
-        }
-        else
-        {
-            <span class="badge bg-secondary mb-3">Check Availability</span>
+            <p>
+                <strong>Pack Size:</strong> @Model.PackSize
+            </p>
         }
 
-        <h4 class="text-primary">Price: Request a Quote</h4>
-
-        @if (Model.PackSize is not null) { <p><strong>Pack Size:</strong> @Model.PackSize</p> }
-        @if (Model.UnitOfMeasure is not null) { <p><strong>Unit of Measure:</strong> @Model.UnitOfMeasure</p> }
+        @if (Model.UnitOfMeasure is not null)
+        {
+            <p>
+                <strong>Unit of Measure:</strong> @Model.UnitOfMeasure
+            </p>
+        }
 
         @if (Model.Description is not null)
         {
@@ -64,34 +123,73 @@
             <p style="white-space: pre-line;">@Model.Specifications</p>
         }
 
-        <form asp-controller="Quotation" asp-action="Add" method="post" class="d-flex align-items-end gap-2 mt-4">
-            <input type="hidden" name="productId" value="@Model.ProductId" />
-            <input type="hidden" name="returnUrl" value="@Url.Action("Details", new { id = Model.ProductId })" />
+        <form asp-controller="Quotation"
+              asp-action="Add"
+              method="post"
+              class="d-flex flex-wrap align-items-end gap-2 mt-4">
+
+            <input type="hidden"
+                   name="productId"
+                   value="@Model.ProductId" />
+
+            <input type="hidden"
+                   name="returnUrl"
+                   value="@Context.Request.Path@Context.Request.QueryString" />
+
             <div>
                 <label class="form-label">Quantity</label>
-                <input type="number" name="quantity" value="1" min="1" class="form-control" style="width:100px;" />
+                <input type="number"
+                       name="quantity"
+                       value="1"
+                       min="1"
+                       class="form-control"
+                       style="width:100px;" />
             </div>
-            <button type="submit" class="btn btn-primary">Request Quotation</button>
+
+            <button type="submit"
+                    class="btn btn-primary">
+                Request Quotation
+            </button>
         </form>
+
+        <div class="alert alert-light border mt-3 mb-0">
+            <strong>Need this product?</strong>
+            We can confirm current pricing, availability, sourcing, and delivery
+            options through your quotation request.
+        </div>
     </div>
 </div>
 
 @if (Model.RelatedProducts.Any())
 {
     <h3 class="mt-5">Related Products</h3>
+
     <div class="row row-cols-1 row-cols-md-4 g-4">
         @foreach (var related in Model.RelatedProducts)
         {
             <div class="col">
-                <div class="card h-100">
-                    <a asp-action="Details" asp-route-id="@related.ProductId">
+                <div class="card h-100 shadow-sm">
+                    <a asp-action="Details"
+                       asp-route-id="@related.ProductId">
+
                         <img src="@(related.PrimaryImageUrl ?? "/images/placeholder-product.svg")"
-                             class="card-img-top" style="height:140px; object-fit:cover;" />
+                             class="card-img-top"
+                             style="height:140px; object-fit:cover;"
+                             alt="@related.ProductName" />
                     </a>
+
                     <div class="card-body">
                         <h6 class="card-title">
-                            <a asp-action="Details" asp-route-id="@related.ProductId" class="text-decoration-none text-dark">@related.ProductName</a>
+                            <a asp-action="Details"
+                               asp-route-id="@related.ProductId"
+                               class="text-decoration-none text-dark">
+                                @related.ProductName
+                            </a>
                         </h6>
+
+                        <div class="small text-muted">
+                            Request a quotation for current pricing.
+                        </div>
                     </div>
                 </div>
             </div>

@@ -9,3 +9,72 @@
     <button type="submit" class="btn btn-primary">Save as Draft</button>
     <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
 </form>
+
+@section Scripts {
+<script>
+    var rowIndex = @Model.Lines.Count;
+    var productOptionsHtml = document.querySelector('.line-product').innerHTML;
+
+    document.getElementById('addRow').addEventListener('click', function () {
+        var tbody = document.querySelector('#lineItemsTable tbody');
+        var row = document.createElement('tr');
+        row.className = 'line-row';
+        row.innerHTML =
+            '<td><select name="Lines[' + rowIndex + '].ProductId" class="form-select line-product">' + productOptionsHtml + '</select></td>' +
+            '<td><input type="number" name="Lines[' + rowIndex + '].Quantity" value="1" min="1" class="form-control line-qty" /></td>' +
+            '<td><input type="number" step="0.01" name="Lines[' + rowIndex + '].UnitCost" value="0" min="0" class="form-control line-cost" /></td>' +
+            '<td class="line-total align-middle">0</td>' +
+            '<td><button type="button" class="btn btn-sm btn-outline-danger remove-row">&times;</button></td>';
+
+        tbody.appendChild(row);
+        rowIndex++;
+        attachRowEvents(row);
+        recalc();
+    });
+
+    function attachRowEvents(row) {
+        row.querySelector('.line-qty').addEventListener('input', recalc);
+        row.querySelector('.line-cost').addEventListener('input', recalc);
+
+        row.querySelector('.remove-row').addEventListener('click', function () {
+            row.remove();
+            recalc();
+        });
+    }
+
+    document.querySelectorAll('.line-row').forEach(attachRowEvents);
+
+    document.getElementById('deliveryCostInput').addEventListener('input', recalc);
+    document.getElementById('taxInput').addEventListener('input', recalc);
+
+    function recalc() {
+        var subtotal = 0;
+
+        document.querySelectorAll('.line-row').forEach(function (row) {
+            var qty = parseFloat(row.querySelector('.line-qty').value) || 0;
+            var cost = parseFloat(row.querySelector('.line-cost').value) || 0;
+            var total = qty * cost;
+
+            row.querySelector('.line-total').textContent =
+                total.toLocaleString(undefined, { maximumFractionDigits: 0 });
+
+            subtotal += total;
+        });
+
+        var extras =
+            (parseFloat(document.getElementById('deliveryCostInput').value) || 0) +
+            (parseFloat(document.getElementById('taxInput').value) || 0);
+
+        document.getElementById('subtotalCell').textContent =
+            subtotal.toLocaleString(undefined, { maximumFractionDigits: 0 });
+
+        document.getElementById('extrasCell').textContent =
+            extras.toLocaleString(undefined, { maximumFractionDigits: 0 });
+
+        document.getElementById('grandTotalCell').textContent =
+            (subtotal + extras).toLocaleString(undefined, { maximumFractionDigits: 0 });
+    }
+
+    recalc();
+</script>
+}

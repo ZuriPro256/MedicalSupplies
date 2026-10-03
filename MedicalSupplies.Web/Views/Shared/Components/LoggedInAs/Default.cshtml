@@ -1,0 +1,15 @@
+@model MedicalSupplies.Web.ViewComponents.LoggedInAsViewModel
+
+<div class="d-flex align-items-center me-3">
+    <div class="text-end lh-sm">
+        <div class="small text-muted">
+            Logged in as
+        </div>
+        <div class="fw-semibold">
+            @Model.AccountName
+        </div>
+        <div class="small text-muted">
+            @Model.Role
+        </div>
+    </div>
+</div>

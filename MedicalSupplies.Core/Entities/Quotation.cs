@@ -30,6 +30,22 @@ public class Quotation
 
     public DateOnly? ValidUntil { get; set; }
 
+    /// <summary>Reason selected by the customer when rejecting the quotation.</summary>
+    public QuotationRejectionReason? RejectionReason { get; set; }
+
+    /// <summary>Optional price the customer would prefer to pay.</summary>
+    public decimal? CustomerExpectedPrice { get; set; }
+
+    /// <summary>Optional explanation or negotiation comment from the customer.</summary>
+    public string? CustomerRejectionComment { get; set; }
+
+    /// <summary>When the customer rejected the quotation.</summary>
+    public DateTime? RejectedDate { get; set; }
+
     public ICollection<QuotationDetail> Details { get; set; } = new List<QuotationDetail>();
+    public ICollection<QuotationOffer> Offers { get; set; } = new List<QuotationOffer>();
+
+    public int? AcceptedOfferId { get; set; }
+    public QuotationOffer? AcceptedOffer { get; set; }
     public ICollection<Order> Orders { get; set; } = new List<Order>();
 }

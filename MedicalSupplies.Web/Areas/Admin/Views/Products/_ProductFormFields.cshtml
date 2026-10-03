@@ -1,4 +1,5 @@
 @model ProductFormViewModel
+@using MedicalSupplies.Core.Enums
 
 <div class="row">
     <div class="col-md-6 mb-3">
@@ -25,15 +26,42 @@
         </select>
         <span asp-validation-for="CategoryId" class="text-danger"></span>
     </div>
+
     <div class="col-md-6 mb-3">
-        <label asp-for="BrandId" class="form-label"></label>
-        <select asp-for="BrandId" class="form-select">
-            <option value="">-- None --</option>
+        <label asp-for="BrandName" class="form-label"></label>
+        <input asp-for="BrandName"
+               class="form-control"
+               list="brandSuggestions"
+               autocomplete="off"
+               placeholder="Type a brand or choose an existing one" />
+        <datalist id="brandSuggestions">
             @foreach (var opt in Model.BrandOptions)
             {
-                <option value="@opt.Value">@opt.Text</option>
+                <option value="@opt.Text"></option>
             }
-        </select>
+        </datalist>
+        <div class="form-text">
+            Existing brands appear as suggestions. A new brand is created automatically when you save.
+        </div>
+        <span asp-validation-for="BrandName" class="text-danger"></span>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-3">
+        <label asp-for="BrandCountry" class="form-label"></label>
+        <input asp-for="BrandCountry" class="form-control"
+               placeholder="e.g. Japan, Germany, India, USA" />
+        <div class="form-text">Country associated with the brand/manufacturer.</div>
+        <span asp-validation-for="BrandCountry" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-6 mb-3">
+        <label asp-for="CountryOfOrigin" class="form-label"></label>
+        <input asp-for="CountryOfOrigin" class="form-control"
+               placeholder="Where this product was manufactured" />
+        <div class="form-text">Product manufacturing origin; it may differ from brand country.</div>
+        <span asp-validation-for="CountryOfOrigin" class="text-danger"></span>
     </div>
 </div>
 
@@ -44,7 +72,8 @@
 
 <div class="mb-3">
     <label asp-for="Specifications" class="form-label"></label>
-    <textarea asp-for="Specifications" class="form-control" rows="3" placeholder="One spec per line, e.g. Result time: 5 seconds"></textarea>
+    <textarea asp-for="Specifications" class="form-control" rows="3"
+              placeholder="One specification per line, e.g. Result time: 5 seconds"></textarea>
 </div>
 
 <div class="row">
@@ -58,27 +87,87 @@
     </div>
     <div class="col-md-4 mb-3">
         <label asp-for="SellingPrice" class="form-label"></label>
-        <input asp-for="SellingPrice" class="form-control" placeholder="Leave blank for &quot;Request a Quote&quot;" />
+        <input asp-for="SellingPrice" class="form-control" placeholder="Leave blank for quotation pricing" />
+        <div class="form-text">Normal catalogue price.</div>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header">
+        <strong>Promotion</strong>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <label asp-for="SalePrice" class="form-label"></label>
+                <input asp-for="SalePrice" class="form-control" placeholder="Optional" />
+                <div class="form-text">Leave blank when the product is not on sale.</div>
+                <span asp-validation-for="SalePrice" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <label asp-for="SaleStartDate" class="form-label"></label>
+                <input asp-for="SaleStartDate" class="form-control" type="date" />
+                <span asp-validation-for="SaleStartDate" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <label asp-for="SaleEndDate" class="form-label"></label>
+                <input asp-for="SaleEndDate" class="form-control" type="date" />
+                <span asp-validation-for="SaleEndDate" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="PriceChangeReason" class="form-label"></label>
+            <input asp-for="PriceChangeReason"
+                   class="form-control"
+                   placeholder="Optional — record why the price was changed." />
+            <div class="form-text">Optional — record why the price was changed.</div>
+            <span asp-validation-for="PriceChangeReason" class="text-danger"></span>
+        </div>
+
+        <div class="form-text">
+            The product will display as <strong>On Sale</strong> when a valid sale price is set
+            and the current date falls within the optional promotion dates.
+        </div>
     </div>
 </div>
 
 <div class="row">
     <div class="col-md-4 mb-3">
+        <label asp-for="Availability" class="form-label"></label>
+        <select asp-for="Availability" class="form-select">
+            <option value="@ProductAvailability.InStock">In Stock</option>
+            <option value="@ProductAvailability.AvailableOnRequest">Available on Request</option>
+            <option value="@ProductAvailability.QuotationRequired">Quotation Required</option>
+            <option value="@ProductAvailability.OutOfStock">Out of Stock</option>
+            <option value="@ProductAvailability.ComingSoon">Coming Soon</option>
+        </select>
+        <span asp-validation-for="Availability" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-4 mb-3">
         <label asp-for="ReorderLevel" class="form-label"></label>
         <input asp-for="ReorderLevel" class="form-control" />
+        <span asp-validation-for="ReorderLevel" class="text-danger"></span>
     </div>
-    <div class="col-md-4 mb-3 form-check pt-4">
+
+    <div class="col-md-2 mb-3 form-check pt-4">
         <input asp-for="RequiresBatchTracking" class="form-check-input" />
         <label asp-for="RequiresBatchTracking" class="form-check-label"></label>
     </div>
-    <div class="col-md-4 mb-3 form-check pt-4">
+
+    <div class="col-md-2 mb-3 form-check pt-4">
         <input asp-for="IsActive" class="form-check-input" />
         <label asp-for="IsActive" class="form-check-label"></label>
     </div>
 </div>
 
 <div class="mb-3">
-    <label asp-for="NewImages" class="form-label">Product Images</label>
+    <label asp-for="NewImages" class="form-label">Add Product Images</label>
     <input type="file" name="NewImages" multiple accept="image/*" class="form-control" />
-    <div class="form-text">First image uploaded (if none exist yet) becomes the primary image.</div>
+    <div class="form-text">
+        Upload additional images. When a product has no primary image, the first uploaded image becomes primary.
+    </div>
 </div>

@@ -1,0 +1,186 @@
+@model MedicalSupplies.Web.ViewModels.Admin.Staff.StaffCreateViewModel
+
+@{
+    ViewData["Title"] = "Create Staff";
+    var groupedPermissions = Model.AvailablePermissions
+        .GroupBy(p => p.Category)
+        .OrderBy(g => g.Key);
+}
+
+<div class="container-fluid">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-1">Create Staff Account</h1>
+            <p class="text-muted mb-0">
+                Create an employee account and control exactly what they can access.
+            </p>
+        </div>
+
+        <a asp-action="Index" class="btn btn-outline-secondary">
+            Back to Staff
+        </a>
+    </div>
+
+    <form asp-action="Create" method="post">
+        @Html.AntiForgeryToken()
+
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-header">
+                <strong>Account Details</strong>
+            </div>
+
+            <div class="card-body">
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+                        <label asp-for="FullName" class="form-label"></label>
+                        <input asp-for="FullName" class="form-control" />
+                        <span asp-validation-for="FullName" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="Email" class="form-label"></label>
+                        <input asp-for="Email" class="form-control" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="Phone" class="form-label"></label>
+                        <input asp-for="Phone" class="form-control" />
+                        <span asp-validation-for="Phone" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="Role" class="form-label"></label>
+                        <select asp-for="Role" class="form-select" id="roleSelect">
+                            <option value="Admin">Admin</option>
+                            <option value="Sales">Sales</option>
+                            <option value="InventoryManager">Inventory Manager</option>
+                            <option value="SuperAdmin">Super Admin</option>
+                        </select>
+                        <span asp-validation-for="Role" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="Password" class="form-label"></label>
+                        <input asp-for="Password" class="form-control" autocomplete="new-password" />
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="ConfirmPassword" class="form-label"></label>
+                        <input asp-for="ConfirmPassword" class="form-control" autocomplete="new-password" />
+                        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="form-check">
+                            <input asp-for="IsActive" class="form-check-input" />
+                            <label asp-for="IsActive" class="form-check-label">
+                                Account is active
+                            </label>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div>
+                    <strong>Permissions</strong>
+                    <div class="small text-muted">
+                        These permissions start from the selected role's defaults.
+                        You can customize them below.
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="button"
+                            class="btn btn-sm btn-outline-primary"
+                            id="selectAllPermissions">
+                        Select All
+                    </button>
+
+                    <button type="button"
+                            class="btn btn-sm btn-outline-secondary"
+                            id="clearAllPermissions">
+                        Clear All
+                    </button>
+                </div>
+            </div>
+
+            <div class="card-body">
+
+                @foreach (var group in groupedPermissions)
+                {
+                    <div class="mb-4">
+                        <h5 class="mb-3">@group.Key</h5>
+
+                        <div class="row g-2">
+                            @foreach (var permission in group)
+                            {
+                                var inputId = "permission_" +
+                                    permission.Permission.Replace(".", "_");
+
+                                <div class="col-md-6 col-lg-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input permission-checkbox"
+                                               type="checkbox"
+                                               name="Permissions"
+                                               value="@permission.Permission"
+                                               id="@inputId"
+                                               @(permission.Selected ? "checked" : null) />
+
+                                        <label class="form-check-label"
+                                               for="@inputId">
+                                            @permission.Description
+                                        </label>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+
+            </div>
+        </div>
+
+        <div class="d-flex gap-2 mb-5">
+            <button type="submit" class="btn btn-primary">
+                Create Staff Account
+            </button>
+
+            <a asp-action="Index" class="btn btn-outline-secondary">
+                Cancel
+            </a>
+        </div>
+
+    </form>
+
+</div>
+
+@section Scripts {
+
+    <script>
+        document.getElementById("selectAllPermissions")
+            ?.addEventListener("click", function () {
+                document.querySelectorAll(".permission-checkbox")
+                    .forEach(function (checkbox) {
+                        checkbox.checked = true;
+                    });
+            });
+
+        document.getElementById("clearAllPermissions")
+            ?.addEventListener("click", function () {
+                document.querySelectorAll(".permission-checkbox")
+                    .forEach(function (checkbox) {
+                        checkbox.checked = false;
+                    });
+            });
+    </script>
+}

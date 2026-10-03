@@ -1,0 +1,127 @@
+@model MedicalSupplies.Web.ViewModels.Admin.PurchaseOrderReturnViewModel
+
+@{
+    ViewData["Title"] = $"Return - {Model.PurchaseOrderNumber}";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h1>Return Goods</h1>
+        <div class="text-muted">
+            Purchase Order: <strong>@Model.PurchaseOrderNumber</strong>
+            · Supplier: <strong>@Model.SupplierName</strong>
+        </div>
+    </div>
+    <a asp-action="Details"
+       asp-route-id="@Model.PurchaseOrderId"
+       class="btn btn-outline-secondary">
+        Back to Purchase Order
+    </a>
+</div>
+
+<div class="alert alert-warning">
+    <strong>Important:</strong>
+    Returning goods reduces the available inventory from the selected batch.
+    The original quantity received is not changed.
+</div>
+
+<form asp-action="Return" method="post">
+    @Html.AntiForgeryToken()
+
+    <input type="hidden" asp-for="PurchaseOrderId" />
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <strong>Received Inventory</strong>
+        </div>
+
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Product</th>
+                            <th>Batch</th>
+                            <th>Expiry</th>
+                            <th>Received</th>
+                            <th>Available</th>
+                            <th style="width: 150px;">Return Qty</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @for (var i = 0; i < Model.Batches.Count; i++)
+                    {
+                        <tr>
+                            <td>
+                                <strong>@Model.Batches[i].ProductName</strong>
+                                <input type="hidden"
+                                       asp-for="Batches[i].BatchId" />
+                                <input type="hidden"
+                                       asp-for="Batches[i].PurchaseOrderDetailId" />
+                            </td>
+                            <td>@(string.IsNullOrWhiteSpace(Model.Batches[i].BatchNumber)
+                                ? "—"
+                                : Model.Batches[i].BatchNumber)</td>
+                            <td>@(Model.Batches[i].ExpiryDate?.ToString("dd MMM yyyy") ?? "—")</td>
+                            <td>@Model.Batches[i].QuantityReceived</td>
+                            <td>
+                                <span class="badge bg-success">
+                                    @Model.Batches[i].QuantityAvailable
+                                </span>
+                            </td>
+                            <td>
+                                <input asp-for="Batches[i].QuantityToReturn"
+                                       class="form-control"
+                                       min="0"
+                                       max="@Model.Batches[i].QuantityAvailable" />
+                                <span asp-validation-for="Batches[i].QuantityToReturn"
+                                      class="text-danger small"></span>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <strong>Return Information</strong>
+        </div>
+
+        <div class="card-body">
+            <div class="mb-3">
+                <label asp-for="Reason" class="form-label">
+                    Reason <span class="text-danger">*</span>
+                </label>
+                <textarea asp-for="Reason"
+                          class="form-control"
+                          rows="3"
+                          placeholder="Why are these goods being returned?"></textarea>
+                <span asp-validation-for="Reason" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Notes" class="form-label">Notes</label>
+                <textarea asp-for="Notes"
+                          class="form-control"
+                          rows="3"
+                          placeholder="Optional additional notes"></textarea>
+                <span asp-validation-for="Notes" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-warning">
+            Record Return
+        </button>
+
+        <a asp-action="Details"
+           asp-route-id="@Model.PurchaseOrderId"
+           class="btn btn-outline-secondary">
+            Cancel
+        </a>
+    </div>
+</form>

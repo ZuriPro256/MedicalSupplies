@@ -1,0 +1,168 @@
+ProductCode,ProductName,ImageType,SVG,PNG
+MEV-001,Bin liner Black,Product illustration,medevax-exploded/products/MEV-001.svg,medevax-exploded/products/png/MEV-001.png
+MEV-002,Bin liner Yellow,Product illustration,medevax-exploded/products/MEV-002.svg,medevax-exploded/products/png/MEV-002.png
+MEV-003,Bin liner Red,Product illustration,medevax-exploded/products/MEV-003.svg,medevax-exploded/products/png/MEV-003.png
+MEV-004,Waste bin red,Exploded view,medevax-exploded/waste_bin_red.svg,medevax-exploded/png/waste_bin_red.png
+MEV-005,waste bin yellow,Exploded view,medevax-exploded/waste_bin_yellow.svg,medevax-exploded/png/waste_bin_yellow.png
+MEV-006,Waste bin black,Exploded view,medevax-exploded/waste_bin_black.svg,medevax-exploded/png/waste_bin_black.png
+MEV-007,Sharps boxes,Exploded view,medevax-exploded/sharps_box.svg,medevax-exploded/png/sharps_box.png
+MEV-008,Urine containers,Product illustration,medevax-exploded/products/MEV-008.svg,medevax-exploded/products/png/MEV-008.png
+MEV-009,Stool containers,Product illustration,medevax-exploded/products/MEV-009.svg,medevax-exploded/products/png/MEV-009.png
+MEV-010,sputum mugs carton,Product illustration,medevax-exploded/products/MEV-010.svg,medevax-exploded/products/png/MEV-010.png
+MEV-011,Sputum mugs,Product illustration,medevax-exploded/products/MEV-011.svg,medevax-exploded/products/png/MEV-011.png
+MEV-012,Falcon tubes 15mL,Exploded view,medevax-exploded/falcon_tube.svg,medevax-exploded/png/falcon_tube.png
+MEV-013,Falcon tubes 50mL,Exploded view,medevax-exploded/falcon_tube.svg,medevax-exploded/png/falcon_tube.png
+MEV-014,1000 uL pipette tips with filter,Product illustration,medevax-exploded/products/MEV-014.svg,medevax-exploded/products/png/MEV-014.png
+MEV-015,200 uL pipette tips with filters,Product illustration,medevax-exploded/products/MEV-015.svg,medevax-exploded/products/png/MEV-015.png
+MEV-016,10 uL pipette tips with filters,Product illustration,medevax-exploded/products/MEV-016.svg,medevax-exploded/products/png/MEV-016.png
+MEV-017,20 uL pipette tips with filters,Product illustration,medevax-exploded/products/MEV-017.svg,medevax-exploded/products/png/MEV-017.png
+MEV-018,PCR tubes 0.2ml,Product illustration,medevax-exploded/products/MEV-018.svg,medevax-exploded/products/png/MEV-018.png
+MEV-019,PCR tubes 0.1mL,Product illustration,medevax-exploded/products/MEV-019.svg,medevax-exploded/products/png/MEV-019.png
+MEV-020,spin column tubes,Product illustration,medevax-exploded/products/MEV-020.svg,medevax-exploded/products/png/MEV-020.png
+MEV-021,eppendorf tubes 1.5ml,Product illustration,medevax-exploded/products/MEV-021.svg,medevax-exploded/products/png/MEV-021.png
+MEV-022,Qiagen DNA extraction kit 250,Product illustration,medevax-exploded/products/MEV-022.svg,medevax-exploded/products/png/MEV-022.png
+MEV-023,"Qiagen RNA extraction kit (spin column tubes, sample collection tubes, extraction reagents )",Product illustration,medevax-exploded/products/MEV-023.svg,medevax-exploded/products/png/MEV-023.png
+MEV-024,"Qiagen RNA extraction kit (spin column tubes, sample collection tubes, extraction reagents )",Product illustration,medevax-exploded/products/MEV-024.svg,medevax-exploded/products/png/MEV-024.png
+MEV-025,cryo boxes plastic,Product illustration,medevax-exploded/products/MEV-025.svg,medevax-exploded/products/png/MEV-025.png
+MEV-026,cryo boxes cardboard,Product illustration,medevax-exploded/products/MEV-026.svg,medevax-exploded/products/png/MEV-026.png
+MEV-027,cryo boxes plastic,Product illustration,medevax-exploded/products/MEV-027.svg,medevax-exploded/products/png/MEV-027.png
+MEV-028,cryo vials,Product illustration,medevax-exploded/products/MEV-028.svg,medevax-exploded/products/png/MEV-028.png
+MEV-029,cryo vials,Product illustration,medevax-exploded/products/MEV-029.svg,medevax-exploded/products/png/MEV-029.png
+MEV-030,cryo vials,Product illustration,medevax-exploded/products/MEV-030.svg,medevax-exploded/products/png/MEV-030.png
+MEV-031,pasteur pipettes Lasec 3mL,Product illustration,medevax-exploded/products/MEV-031.svg,medevax-exploded/products/png/MEV-031.png
+MEV-032,Standard Q Biosensor COVID-19 Ag,Exploded view,medevax-exploded/rapid_test_cassette.svg,medevax-exploded/png/rapid_test_cassette.png
+MEV-033,Abbott PanBio COVID-19 Ag,Exploded view,medevax-exploded/rapid_test_cassette.svg,medevax-exploded/png/rapid_test_cassette.png
+MEV-034,Accurate Typhoid IgG/IgM serum,Exploded view,medevax-exploded/rapid_test_cassette.svg,medevax-exploded/png/rapid_test_cassette.png
+MEV-035,Pal Typhoid Ag Stool,Exploded view,medevax-exploded/rapid_test_cassette.svg,medevax-exploded/png/rapid_test_cassette.png
+MEV-036,Pal H.Pylori Ab Serum/ Blood,Exploded view,medevax-exploded/rapid_test_cassette.svg,medevax-exploded/png/rapid_test_cassette.png
+MEV-037,Pal H.Pylori Ag Stool,Exploded view,medevax-exploded/rapid_test_cassette.svg,medevax-exploded/png/rapid_test_cassette.png
+MEV-038,Pal Hepatitis B,Exploded view,medevax-exploded/rapid_test_cassette.svg,medevax-exploded/png/rapid_test_cassette.png
+MEV-039,Accurate HBsAg,Exploded view,medevax-exploded/rapid_test_cassette.svg,medevax-exploded/png/rapid_test_cassette.png
+MEV-040,Pal Hepatitis A,Exploded view,medevax-exploded/rapid_test_cassette.svg,medevax-exploded/png/rapid_test_cassette.png
+MEV-041,Whole power HCV Antibody test strip (WB/Serum/Plasma),Exploded view,medevax-exploded/rapid_test_cassette.svg,medevax-exploded/png/rapid_test_cassette.png
+MEV-042,Pal Hepatitis C,Exploded view,medevax-exploded/rapid_test_cassette.svg,medevax-exploded/png/rapid_test_cassette.png
+MEV-043,Pal Syphilis,Exploded view,medevax-exploded/rapid_test_cassette.svg,medevax-exploded/png/rapid_test_cassette.png
+MEV-044,Pal HCG strips urine,Exploded view,medevax-exploded/rapid_test_cassette.svg,medevax-exploded/png/rapid_test_cassette.png
+MEV-045,HCG serum strips,Exploded view,medevax-exploded/rapid_test_cassette.svg,medevax-exploded/png/rapid_test_cassette.png
+MEV-046,Accurate Syphilis,Exploded view,medevax-exploded/rapid_test_cassette.svg,medevax-exploded/png/rapid_test_cassette.png
+MEV-047,Abbott HIV/Syphilis Duo,Exploded view,medevax-exploded/rapid_test_cassette.svg,medevax-exploded/png/rapid_test_cassette.png
+MEV-048,HIV 1/2 Determine Ab,Exploded view,medevax-exploded/rapid_test_cassette.svg,medevax-exploded/png/rapid_test_cassette.png
+MEV-049,Hiv 1/2 Statpak,Exploded view,medevax-exploded/rapid_test_cassette.svg,medevax-exploded/png/rapid_test_cassette.png
+MEV-050,HIV 1/2 SD Bioline,Exploded view,medevax-exploded/rapid_test_cassette.svg,medevax-exploded/png/rapid_test_cassette.png
+MEV-051,First Response Malaria p.f Ag,Exploded view,medevax-exploded/rapid_test_cassette.svg,medevax-exploded/png/rapid_test_cassette.png
+MEV-052,SD Malaria p.f pan,Exploded view,medevax-exploded/rapid_test_cassette.svg,medevax-exploded/png/rapid_test_cassette.png
+MEV-053,Abbott malaria p.f,Exploded view,medevax-exploded/rapid_test_cassette.svg,medevax-exploded/png/rapid_test_cassette.png
+MEV-054,Abbott malaria p.f/pan,Exploded view,medevax-exploded/rapid_test_cassette.svg,medevax-exploded/png/rapid_test_cassette.png
+MEV-055,Brucella Agglutination Test (BAT) reagent Cypress,Product illustration,medevax-exploded/products/MEV-055.svg,medevax-exploded/products/png/MEV-055.png
+MEV-056,Rheumatoid factor Reagent Atlas,Product illustration,medevax-exploded/products/MEV-056.svg,medevax-exploded/products/png/MEV-056.png
+MEV-057,CRP reagent Atlas,Product illustration,medevax-exploded/products/MEV-057.svg,medevax-exploded/products/png/MEV-057.png
+MEV-058,BD automatic lancets,Product illustration,medevax-exploded/products/MEV-058.svg,medevax-exploded/products/png/MEV-058.png
+MEV-059,Egolance automatic lancets,Product illustration,medevax-exploded/products/MEV-059.svg,medevax-exploded/products/png/MEV-059.png
+MEV-060,HSY urine H-10 urine strips,Product illustration,medevax-exploded/products/MEV-060.svg,medevax-exploded/products/png/MEV-060.png
+MEV-061,Frosted glass slides,Product illustration,medevax-exploded/products/MEV-061.svg,medevax-exploded/products/png/MEV-061.png
+MEV-062,Frosted glass slides,Product illustration,medevax-exploded/products/MEV-062.svg,medevax-exploded/products/png/MEV-062.png
+MEV-063,PDMS Alcohol swabs,Product illustration,medevax-exploded/products/MEV-063.svg,medevax-exploded/products/png/MEV-063.png
+MEV-064,PDMS Alcohol swabs,Product illustration,medevax-exploded/products/MEV-064.svg,medevax-exploded/products/png/MEV-064.png
+MEV-065,BD EDTA purple top vacutainers 4mL,Exploded view,medevax-exploded/vacutainer_edta_purple.svg,medevax-exploded/png/vacutainer_edta_purple.png
+MEV-066,BD EDTA Red top vacutainers 4mL,Exploded view,medevax-exploded/vacutainer_edta_red.svg,medevax-exploded/png/vacutainer_edta_red.png
+MEV-067,Yellow top vacutainer SST 4mL,Exploded view,medevax-exploded/vacutainer_sst_yellow.svg,medevax-exploded/png/vacutainer_sst_yellow.png
+MEV-068,Blue top vacutainer 4mL,Exploded view,medevax-exploded/vacutainer_blue.svg,medevax-exploded/png/vacutainer_blue.png
+MEV-069,BD Green top vacutainer 4mL,Exploded view,medevax-exploded/vacutainer_green_4ml.svg,medevax-exploded/png/vacutainer_green_4ml.png
+MEV-070,Grey top vacutainer 4mL,Exploded view,medevax-exploded/vacutainer_grey.svg,medevax-exploded/png/vacutainer_grey.png
+MEV-071,Plasma Preparation tubes PPT 5mL,Exploded view,medevax-exploded/vacutainer_ppt.svg,medevax-exploded/png/vacutainer_ppt.png
+MEV-072,BD Green top vacutainer 10mL,Exploded view,medevax-exploded/vacutainer_green_10ml.svg,medevax-exploded/png/vacutainer_green_10ml.png
+MEV-073,BD Vacutainer needles gauge 21,Exploded view,medevax-exploded/needle_holder.svg,medevax-exploded/png/needle_holder.png
+MEV-074,BD butterfly needles gauge 23,Exploded view,medevax-exploded/butterfly_needle.svg,medevax-exploded/png/butterfly_needle.png
+MEV-075,BD butterfly needles gauge 21,Exploded view,medevax-exploded/butterfly_needle.svg,medevax-exploded/png/butterfly_needle.png
+MEV-076,BD vacutainer eclipse blood collection needle with preattached holder,Exploded view,medevax-exploded/needle_holder.svg,medevax-exploded/png/needle_holder.png
+MEV-077,BD vacutainer needle holders,Exploded view,medevax-exploded/needle_holder.svg,medevax-exploded/png/needle_holder.png
+MEV-078,Syringes 2mL,Exploded view,medevax-exploded/syringe.svg,medevax-exploded/png/syringe.png
+MEV-079,Syringes 5mL,Exploded view,medevax-exploded/syringe.svg,medevax-exploded/png/syringe.png
+MEV-080,Syringes 10mL,Exploded view,medevax-exploded/syringe.svg,medevax-exploded/png/syringe.png
+MEV-081,Insulin syringes with needles,Exploded view,medevax-exploded/syringe.svg,medevax-exploded/png/syringe.png
+MEV-082,Clinical thermometer,Exploded view,medevax-exploded/thermometer.svg,medevax-exploded/png/thermometer.png
+MEV-083,Stethoscope class 3 classic,Exploded view,medevax-exploded/stethoscope.svg,medevax-exploded/png/stethoscope.png
+MEV-084,Stethoscope class 2 classic,Exploded view,medevax-exploded/stethoscope.svg,medevax-exploded/png/stethoscope.png
+MEV-085,plasters,Product illustration,medevax-exploded/products/MEV-085.svg,medevax-exploded/products/png/MEV-085.png
+MEV-086,First Aid kits Small,Product illustration,medevax-exploded/products/MEV-086.svg,medevax-exploded/products/png/MEV-086.png
+MEV-087,First Aid kits medium,Product illustration,medevax-exploded/products/MEV-087.svg,medevax-exploded/products/png/MEV-087.png
+MEV-088,First Aid kits Large,Product illustration,medevax-exploded/products/MEV-088.svg,medevax-exploded/products/png/MEV-088.png
+MEV-089,powdered latex gloves,Product illustration,medevax-exploded/products/MEV-089.svg,medevax-exploded/products/png/MEV-089.png
+MEV-090,Powder free latex gloves,Product illustration,medevax-exploded/products/MEV-090.svg,medevax-exploded/products/png/MEV-090.png
+MEV-091,Powder free nitrile gloves,Product illustration,medevax-exploded/products/MEV-091.svg,medevax-exploded/products/png/MEV-091.png
+MEV-092,Surgical gloves size 7.5,Product illustration,medevax-exploded/products/MEV-092.svg,medevax-exploded/products/png/MEV-092.png
+MEV-093,GSC light green frame clear lens uncoated,Product illustration,medevax-exploded/products/MEV-093.svg,medevax-exploded/products/png/MEV-093.png
+MEV-094,Disposable hospital gowns,Product illustration,medevax-exploded/products/MEV-094.svg,medevax-exploded/products/png/MEV-094.png
+MEV-095,Disposable lab coats White,Product illustration,medevax-exploded/products/MEV-095.svg,medevax-exploded/products/png/MEV-095.png
+MEV-096,Disposable lab coats Blue,Product illustration,medevax-exploded/products/MEV-096.svg,medevax-exploded/products/png/MEV-096.png
+MEV-097,Coverallas white/Blue,Product illustration,medevax-exploded/products/MEV-097.svg,medevax-exploded/products/png/MEV-097.png
+MEV-098,Reusable ordinary lab coats,Product illustration,medevax-exploded/products/MEV-098.svg,medevax-exploded/products/png/MEV-098.png
+MEV-099,Surgical masks blue/black,Product illustration,medevax-exploded/products/MEV-099.svg,medevax-exploded/products/png/MEV-099.png
+MEV-100,KN95 Respiratory protection mask,Product illustration,medevax-exploded/products/MEV-100.svg,medevax-exploded/products/png/MEV-100.png
+MEV-101,N95 green face masks,Product illustration,medevax-exploded/products/MEV-101.svg,medevax-exploded/products/png/MEV-101.png
+MEV-102,Oncall glucometer,Exploded view,medevax-exploded/glucometer.svg,medevax-exploded/png/glucometer.png
+MEV-103,Oncall glucose strips,Exploded view,medevax-exploded/glucometer.svg,medevax-exploded/png/glucometer.png
+MEV-104,HIMEDIA SIM MEDIA M181-500G,Product illustration,medevax-exploded/products/MEV-104.svg,medevax-exploded/products/png/MEV-104.png
+MEV-105,HIMEDIA TRIPLE IRON AGAR M0231-500G,Product illustration,medevax-exploded/products/MEV-105.svg,medevax-exploded/products/png/MEV-105.png
+MEV-106,HIMEDIA MUELLER HINTON AGAR No.2 M0184-500G,Product illustration,medevax-exploded/products/MEV-106.svg,medevax-exploded/products/png/MEV-106.png
+MEV-107,HIMEDIA UREA AGAR BASE (CHRISTENSEN)(AUTOCLAVABLE) M112-500G,Product illustration,medevax-exploded/products/MEV-107.svg,medevax-exploded/products/png/MEV-107.png
+MEV-108,HIMEDIA SIMMONS CITRATE AGAR N099-500G,Product illustration,medevax-exploded/products/MEV-108.svg,medevax-exploded/products/png/MEV-108.png
+MEV-109,HIMEDIA/Oxoid MacConkey,Product illustration,medevax-exploded/products/MEV-109.svg,medevax-exploded/products/png/MEV-109.png
+MEV-110,HIMEDIA/Oxoid blood agar base,Product illustration,medevax-exploded/products/MEV-110.svg,medevax-exploded/products/png/MEV-110.png
+MEV-111,Plate count Agar,Product illustration,medevax-exploded/products/MEV-111.svg,medevax-exploded/products/png/MEV-111.png
+MEV-112,Buffered pepton water,Product illustration,medevax-exploded/products/MEV-112.svg,medevax-exploded/products/png/MEV-112.png
+MEV-113,Sabouraud dextrose agar,Product illustration,medevax-exploded/products/MEV-113.svg,medevax-exploded/products/png/MEV-113.png
+MEV-114,Brain heart infusion broth,Product illustration,medevax-exploded/products/MEV-114.svg,medevax-exploded/products/png/MEV-114.png
+MEV-115,Nutrient agar,Product illustration,medevax-exploded/products/MEV-115.svg,medevax-exploded/products/png/MEV-115.png
+MEV-116,Rappaport Vassiliadis soy broth,Product illustration,medevax-exploded/products/MEV-116.svg,medevax-exploded/products/png/MEV-116.png
+MEV-117,Drug discs,Product illustration,medevax-exploded/products/MEV-117.svg,medevax-exploded/products/png/MEV-117.png
+MEV-118,Petri Dishes,Product illustration,medevax-exploded/products/MEV-118.svg,medevax-exploded/products/png/MEV-118.png
+MEV-119,HVS swabs,Product illustration,medevax-exploded/products/MEV-119.svg,medevax-exploded/products/png/MEV-119.png
+MEV-120,Nasal swabs,Product illustration,medevax-exploded/products/MEV-120.svg,medevax-exploded/products/png/MEV-120.png
+MEV-121,Oral swabs,Product illustration,medevax-exploded/products/MEV-121.svg,medevax-exploded/products/png/MEV-121.png
+MEV-122,Arm Electonic Blood pressure Monitor Model:x802 Golden quality,Exploded view,medevax-exploded/bp_monitor.svg,medevax-exploded/png/bp_monitor.png
+MEV-123,XSZ microscope,Exploded view,medevax-exploded/microscope.svg,medevax-exploded/png/microscope.png
+MEV-124,Olympus CX23 microscope,Exploded view,medevax-exploded/microscope.svg,medevax-exploded/png/microscope.png
+MEV-125,Autoclave 35L,Exploded view,medevax-exploded/autoclave.svg,medevax-exploded/png/autoclave.png
+MEV-126,Centrifuge 8 buckets,Exploded view,medevax-exploded/centrifuge.svg,medevax-exploded/png/centrifuge.png
+MEV-127,Centrifuge 48 buckets,Exploded view,medevax-exploded/centrifuge.svg,medevax-exploded/png/centrifuge.png
+MEV-128,Laboratory oven 50L,Exploded view,medevax-exploded/oven_incubator.svg,medevax-exploded/png/oven_incubator.png
+MEV-129,Laboratory culture incubator 54L,Exploded view,medevax-exploded/oven_incubator.svg,medevax-exploded/png/oven_incubator.png
+MEV-130,Biobase Biosafety cabinet class 2,Exploded view,medevax-exploded/biosafety_cabinet.svg,medevax-exploded/png/biosafety_cabinet.png
+MEV-131,Weighing scale Analog,Exploded view,medevax-exploded/balance_analog.svg,medevax-exploded/png/balance_analog.png
+MEV-132,Analytical weighing scale digital,Exploded view,medevax-exploded/balance_analytical.svg,medevax-exploded/png/balance_analytical.png
+MEV-133,Vortex mixer,Exploded view,medevax-exploded/vortex_mixer.svg,medevax-exploded/png/vortex_mixer.png
+MEV-134,Slide warmer electronic / heat block,Exploded view,medevax-exploded/heat_block.svg,medevax-exploded/png/heat_block.png
+MEV-135,Water bath,Exploded view,medevax-exploded/water_bath.svg,medevax-exploded/png/water_bath.png
+MEV-136,"Single channel automatic pipettesMicro 1000uL, 200uL, 10uL, 50uL, 20uL made in china",Exploded view,medevax-exploded/pipette.svg,medevax-exploded/png/pipette.png
+MEV-137,"Single channel automatic pipettesMicro 1000uL, 200uL, 10uL, 50uL, 20uL made in Germany",Exploded view,medevax-exploded/pipette.svg,medevax-exploded/png/pipette.png
+MEV-138,Microscope lens tissue cleaner,Product illustration,medevax-exploded/products/MEV-138.svg,medevax-exploded/products/png/MEV-138.png
+MEV-139,Field Stains A 1L ready to use,Product illustration,medevax-exploded/products/MEV-139.svg,medevax-exploded/products/png/MEV-139.png
+MEV-140,Field Stains B 1L ready to use,Product illustration,medevax-exploded/products/MEV-140.svg,medevax-exploded/products/png/MEV-140.png
+MEV-141,"Blood group Antisera set A,B,AB, and D",Product illustration,medevax-exploded/products/MEV-141.svg,medevax-exploded/products/png/MEV-141.png
+MEV-142,Blood grouping tile,Product illustration,medevax-exploded/products/MEV-142.svg,medevax-exploded/products/png/MEV-142.png
+MEV-143,immersion oil,Product illustration,medevax-exploded/products/MEV-143.svg,medevax-exploded/products/png/MEV-143.png
+MEV-144,70% Ethanol 20L,Product illustration,medevax-exploded/products/MEV-144.svg,medevax-exploded/products/png/MEV-144.png
+MEV-145,KJIK 5L,Product illustration,medevax-exploded/products/MEV-145.svg,medevax-exploded/products/png/MEV-145.png
+MEV-146,Parafilm,Product illustration,medevax-exploded/products/MEV-146.svg,medevax-exploded/products/png/MEV-146.png
+MEV-147,Cotton wool 500g,Product illustration,medevax-exploded/products/MEV-147.svg,medevax-exploded/products/png/MEV-147.png
+MEV-148,Paper towel,Product illustration,medevax-exploded/products/MEV-148.svg,medevax-exploded/products/png/MEV-148.png
+MEV-149,Distilled water,Product illustration,medevax-exploded/products/MEV-149.svg,medevax-exploded/products/png/MEV-149.png
+MEV-150,Tourniquet,Product illustration,medevax-exploded/products/MEV-150.svg,medevax-exploded/products/png/MEV-150.png
+MEV-151,Wheel chair,Exploded view,medevax-exploded/wheelchair.svg,medevax-exploded/png/wheelchair.png
+MEV-152,Wheel chair with reusable under bucket,Exploded view,medevax-exploded/wheelchair.svg,medevax-exploded/png/wheelchair.png
+MEV-153,Electric wheel chair,Exploded view,medevax-exploded/wheelchair.svg,medevax-exploded/png/wheelchair.png
+MEV-154,Pulse oximeter,Exploded view,medevax-exploded/pulse_oximeter.svg,medevax-exploded/png/pulse_oximeter.png
+MEV-155,Hemocue 301 HB machine,Exploded view,medevax-exploded/hemocue_analyser.svg,medevax-exploded/png/hemocue_analyser.png
+MEV-156,Hemocue 301 HB cuvettes,Exploded view,medevax-exploded/hemocue_analyser.svg,medevax-exploded/png/hemocue_analyser.png
+MEV-157,Hemocue 301 HB cuvettes box,Exploded view,medevax-exploded/hemocue_analyser.svg,medevax-exploded/png/hemocue_analyser.png
+MEV-158,Hemocue 201 HB machine,Exploded view,medevax-exploded/hemocue_analyser.svg,medevax-exploded/png/hemocue_analyser.png
+MEV-159,Hemocue 201 HB cuvettes,Exploded view,medevax-exploded/hemocue_analyser.svg,medevax-exploded/png/hemocue_analyser.png
+MEV-160,Hemocue 201 HB cuvettes box,Exploded view,medevax-exploded/hemocue_analyser.svg,medevax-exploded/png/hemocue_analyser.png
+MEV-161,CBC machine 3 part,Exploded view,medevax-exploded/cbc_analyser.svg,medevax-exploded/png/cbc_analyser.png
+MEV-162,CBC machine 5 part,Exploded view,medevax-exploded/cbc_analyser.svg,medevax-exploded/png/cbc_analyser.png
+MEV-163,mobile lab stools for microscopy,Exploded view,medevax-exploded/lab_stool.svg,medevax-exploded/png/lab_stool.png
+MEV-164,cool box 4.5L,Exploded view,medevax-exploded/cool_box.svg,medevax-exploded/png/cool_box.png
+MEV-165,Cool box 12L,Exploded view,medevax-exploded/cool_box.svg,medevax-exploded/png/cool_box.png
+MEV-166,Cool box 15L,Exploded view,medevax-exploded/cool_box.svg,medevax-exploded/png/cool_box.png
+MEV-167,Ice packs,Exploded view,medevax-exploded/cool_box.svg,medevax-exploded/png/cool_box.png

@@ -1,4 +1,28 @@
 @model QuotationPricingViewModel
+
+@if (Model.Status == MedicalSupplies.Core.Enums.QuotationStatus.Rejected)
+{
+    <div class="card border-warning mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Quotation Negotiation</h5>
+            <p class="text-muted mb-3">
+                The customer rejected this quotation. You can create a separate revised offer
+                without changing the original quotation or its rejection history.
+            </p>
+
+            <form asp-action="CreateRevisedOffer"
+                  asp-route-id="@Model.QuotationId"
+                  method="post">
+                @Html.AntiForgeryToken()
+
+                <button type="submit" class="btn btn-warning">
+                    Create Revised Offer
+                </button>
+            </form>
+        </div>
+    </div>
+}
+
 @{
     ViewData["Title"] = $"Quotation {Model.QuotationNumber}";
     var isEditable = Model.Status is MedicalSupplies.Core.Enums.QuotationStatus.Pending
@@ -24,6 +48,201 @@
     </div>
 </div>
 
+@if (Model.Status == MedicalSupplies.Core.Enums.QuotationStatus.Rejected
+    && Model.RejectionReason is not null)
+{
+    <div class="card border-warning mb-4">
+        <div class="card-header bg-warning-subtle">
+            <strong>Customer Rejection Feedback</strong>
+        </div>
+        <div class="card-body">
+            <dl class="row mb-0">
+                <dt class="col-sm-4">Reason</dt>
+                <dd class="col-sm-8">
+                    @switch (Model.RejectionReason)
+                    {
+                        case MedicalSupplies.Core.Enums.QuotationRejectionReason.PriceTooHigh:
+                            <text>Price is too high</text>
+                            break;
+                        case MedicalSupplies.Core.Enums.QuotationRejectionReason.FoundBetterPrice:
+                            <text>I found a better price</text>
+                            break;
+                        case MedicalSupplies.Core.Enums.QuotationRejectionReason.QuantityNotSuitable:
+                            <text>Quantity is not suitable</text>
+                            break;
+                        case MedicalSupplies.Core.Enums.QuotationRejectionReason.DeliveryIssue:
+                            <text>Delivery terms/location</text>
+                            break;
+                        case MedicalSupplies.Core.Enums.QuotationRejectionReason.NoLongerNeeded:
+                            <text>No longer needed</text>
+                            break;
+                        case MedicalSupplies.Core.Enums.QuotationRejectionReason.Other:
+                            <text>Other</text>
+                            break;
+                    }
+                </dd>
+
+                @if (Model.CustomerExpectedPrice.HasValue)
+                {
+                    <dt class="col-sm-4">Customer Expected Price</dt>
+                    <dd class="col-sm-8">
+                        <strong>UGX @Model.CustomerExpectedPrice.Value.ToString("N0")</strong>
+                    </dd>
+                }
+
+                @if (!string.IsNullOrWhiteSpace(Model.CustomerRejectionComment))
+                {
+                    <dt class="col-sm-4">Customer Comments</dt>
+                    <dd class="col-sm-8">
+                        @Model.CustomerRejectionComment
+                    </dd>
+                }
+
+                @if (Model.RejectedDate.HasValue)
+                {
+                    <dt class="col-sm-4">Rejected On</dt>
+                    <dd class="col-sm-8">
+                        @Model.RejectedDate.Value.ToLocalTime().ToString("dd MMM yyyy, HH:mm")
+                    </dd>
+                }
+            </dl>
+        </div>
+    </div>
+}
+
+@if (Model.Offers.Any())
+{
+    <div class="card mb-4">
+        <div class="card-header">
+            <strong>Revision History</strong>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0 align-middle">
+                    <thead>
+                        <tr>
+                            <th>Offer</th>
+                            <th>Revision</th>
+                            <th>Status</th>
+                            <th>Created</th>
+                            <th>Total</th>
+                            <th class="text-end">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var offer in Model.Offers)
+                    {
+                        <tr>
+                            <td>
+                                <strong>@offer.OfferNumber</strong>
+                            </td>
+                            <td>R@(offer.RevisionNumber)</td>
+                            <td>
+                                <span class="badge bg-secondary">
+                                    @offer.Status
+                                </span>
+                            </td>
+                            <td>
+                                @offer.CreatedDate.ToLocalTime().ToString("dd MMM yyyy, HH:mm")
+                            </td>
+                            <td>
+                                @(offer.TotalAmount.HasValue
+                                    ? $"UGX {offer.TotalAmount.Value:N0}"
+                                    : "—")
+                            </td>
+                            <td class="text-end">
+                                <a asp-action="OfferDetails"
+                                   asp-route-id="@offer.QuotationOfferId"
+                                   class="btn btn-sm btn-outline-primary">
+                                    View Offer
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+}
+
+@if (Model.AcceptedOffer is not null)
+{
+    <div class="card border-success mb-4">
+        <div class="card-header bg-success-subtle">
+            <strong>Accepted Offer — R@(Model.AcceptedOffer.RevisionNumber)</strong>
+            <span class="text-muted ms-2">@Model.AcceptedOffer.OfferNumber</span>
+        </div>
+
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-sm align-middle">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Qty</th>
+                            <th class="text-end">Unit Price (UGX)</th>
+                            <th class="text-end">Total (UGX)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var line in Model.AcceptedOffer.Lines)
+                    {
+                        <tr>
+                            <td>
+                                @line.ProductName
+                                @if (!string.IsNullOrWhiteSpace(line.PackSize))
+                                {
+                                    <span class="text-muted">(@line.PackSize)</span>
+                                }
+                            </td>
+                            <td>@line.Quantity</td>
+                            <td class="text-end">@line.UnitPrice.ToString("N0")</td>
+                            <td class="text-end">@line.LineTotal.ToString("N0")</td>
+                        </tr>
+                    }
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="3" class="text-end">Subtotal</td>
+                            <td class="text-end">
+                                UGX @Model.AcceptedOffer.SubTotal.ToString("N0")
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" class="text-end">Discount</td>
+                            <td class="text-end">
+                                UGX @Model.AcceptedOffer.DiscountAmount.ToString("N0")
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" class="text-end">Delivery / Transport</td>
+                            <td class="text-end">
+                                UGX @Model.AcceptedOffer.DeliveryCost.ToString("N0")
+                            </td>
+                        </tr>
+                        <tr class="fw-bold">
+                            <td colspan="3" class="text-end">TOTAL TO ORDER</td>
+                            <td class="text-end">
+                                UGX @Model.AcceptedOffer.GrandTotal.ToString("N0")
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+            <div class="mt-3">
+                <a asp-action="OfferDetails"
+                   asp-route-id="@Model.AcceptedOffer.QuotationOfferId"
+                   class="btn btn-sm btn-outline-primary">
+                    View Accepted Offer
+                </a>
+            </div>
+        </div>
+    </div>
+}
+else
+{
 <form asp-action="SavePricing" method="post">
     <input type="hidden" asp-for="QuotationId" />
 
@@ -125,6 +344,7 @@
     }
 </form>
 
+}
 @if (Model.Status == MedicalSupplies.Core.Enums.QuotationStatus.Sent)
 {
     <div class="mt-3 d-flex gap-2">

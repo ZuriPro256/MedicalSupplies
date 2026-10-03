@@ -1,27 +1,42 @@
 @model AccountDashboardViewModel
 @{ ViewData["Title"] = "My Account"; }
 
-<h1>My Account</h1>
-<p class="text-muted">@Model.DisplayName</p>
+<h1>Business Account</h1>
+<p class="text-muted mb-1">@Model.DisplayName</p>
+<p class="text-muted">Manage your quotations, orders, and account activity.</p>
 
 <div class="row g-3 mb-4">
     <div class="col-md-4">
-        <div class="card text-center p-3">
-            <div class="fs-2">@Model.QuotationCount</div>
-            <div class="text-muted">Quotations</div>
-        </div>
+        <a asp-controller="Account"
+           asp-action="Quotations"
+           class="text-decoration-none text-reset">
+            <div class="card text-center p-3 h-100">
+                <div class="fs-2">@Model.QuotationCount</div>
+                <div class="text-muted">Quotations</div>
+            </div>
+        </a>
     </div>
+
     <div class="col-md-4">
-        <div class="card text-center p-3">
-            <div class="fs-2">@Model.OrderCount</div>
-            <div class="text-muted">Orders</div>
-        </div>
+        <a asp-controller="Account"
+           asp-action="Orders"
+           class="text-decoration-none text-reset">
+            <div class="card text-center p-3 h-100">
+                <div class="fs-2">@Model.OrderCount</div>
+                <div class="text-muted">Orders</div>
+            </div>
+        </a>
     </div>
+
     <div class="col-md-4">
-        <div class="card text-center p-3">
-            <div class="fs-2">@Model.PendingQuotationCount</div>
-            <div class="text-muted">Pending</div>
-        </div>
+        <a asp-controller="Account"
+           asp-action="Quotations"
+           class="text-decoration-none text-reset">
+            <div class="card text-center p-3 h-100">
+                <div class="fs-2">@Model.PendingQuotationCount</div>
+                <div class="text-muted">Pending Quotations</div>
+            </div>
+        </a>
     </div>
 </div>
 

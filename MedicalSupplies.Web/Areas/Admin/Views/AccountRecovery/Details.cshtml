@@ -1,0 +1,628 @@
+@model MedicalSupplies.Web.ViewModels.Admin.AccountRecovery.AccountRecoveryDetailsViewModel
+
+@{
+    ViewData["Title"] = "Account Recovery Details";
+    var phoneCountries = ViewBag.PhoneCountries as IReadOnlyList<MedicalSupplies.Web.Services.PhoneCountryOption>
+                          ?? Array.Empty<MedicalSupplies.Web.Services.PhoneCountryOption>();
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="mb-1">Account Recovery Details</h1>
+        <p class="text-muted mb-0">
+            Review the customer's account recovery request.
+        </p>
+    </div>
+
+    <a asp-action="Index" class="btn btn-outline-secondary">
+        Back to Account Recovery
+    </a>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+
+        <div class="card shadow-sm">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Customer Information</h5>
+            </div>
+
+            <div class="card-body">
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+                        <div class="text-muted small">Organization</div>
+                        <div class="fw-semibold">
+                            @if (!string.IsNullOrWhiteSpace(Model.Customer.OrganizationName))
+                            {
+                                @Model.Customer.OrganizationName
+                            }
+                            else
+                            {
+                                <span class="text-muted">Not provided</span>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="text-muted small">Customer</div>
+                        <div class="fw-semibold">
+                            @Model.Customer.CustomerName
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="text-muted small">Registered Email</div>
+                        <div>
+                            @if (!string.IsNullOrWhiteSpace(Model.Customer.Email))
+                            {
+                                @Model.Customer.Email
+                            }
+                            else
+                            {
+                                <span class="text-muted">Not provided</span>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="text-muted small">Registered Phone</div>
+                        <div>
+                            @if (!string.IsNullOrWhiteSpace(Model.Customer.Phone))
+                            {
+                                @Model.Customer.Phone
+                            }
+                            else
+                            {
+                                <span class="text-muted">Not provided</span>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="text-muted small">Customer Type</div>
+                        <div>
+                            @Model.Customer.CustomerType
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="text-muted small">Account Status</div>
+                        <div>
+                            @if (Model.Customer.IsActive)
+                            {
+                                <span class="badge bg-success">Active</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Inactive</span>
+                            }
+
+                            @if (Model.Customer.HasLogin)
+                            {
+                                <span class="badge bg-primary">Has Login</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning text-dark">No Login</span>
+                            }
+                        </div>
+                    </div>
+
+                    @if (!string.IsNullOrWhiteSpace(Model.Customer.Address) ||
+                         !string.IsNullOrWhiteSpace(Model.Customer.City))
+                    {
+                        <div class="col-12">
+                            <div class="text-muted small">Address</div>
+                            <div>
+                                @Model.Customer.Address
+                                @if (!string.IsNullOrWhiteSpace(Model.Customer.Address) &&
+                                     !string.IsNullOrWhiteSpace(Model.Customer.City))
+                                {
+                                    <span>, </span>
+                                }
+                                @Model.Customer.City
+                            </div>
+                        </div>
+                    }
+
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm mt-4">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Recovery Request</h5>
+            </div>
+
+            <div class="card-body">
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+                        <div class="text-muted small">Recovery Type</div>
+                        <div class="fw-semibold">
+                            @Model.RecoveryType
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="text-muted small">Status</div>
+                        <div>
+                            @if (string.Equals(Model.Status, "Pending", StringComparison.OrdinalIgnoreCase))
+                            {
+                                <span class="badge bg-warning text-dark">Pending</span>
+                            }
+                            else if (string.Equals(Model.Status, "Approved", StringComparison.OrdinalIgnoreCase))
+                            {
+                                <span class="badge bg-success">Approved</span>
+                            }
+                            else if (string.Equals(Model.Status, "Rejected", StringComparison.OrdinalIgnoreCase))
+                            {
+                                <span class="badge bg-danger">Rejected</span>
+                            }
+                            else if (string.Equals(Model.Status, "Completed", StringComparison.OrdinalIgnoreCase))
+                            {
+                                <span class="badge bg-secondary">Completed</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-light text-dark">
+                                    @Model.Status
+                                </span>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="text-muted small">Submitted Email</div>
+                        <div>
+                            @Model.SubmittedEmail
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="text-muted small">Submitted Phone</div>
+                        <div>
+                            @Model.SubmittedPhone
+                        </div>
+                    </div>
+
+                    @if (!string.IsNullOrWhiteSpace(Model.NewContactPhone))
+                    {
+                        <div class="col-md-6">
+                            <div class="text-muted small">Requested New Phone</div>
+                            <div>
+                                @Model.NewContactPhone
+                            </div>
+                        </div>
+                    }
+
+                    <div class="col-md-6">
+                        <div class="text-muted small">Submitted</div>
+                        <div>
+                            @(Model.CreatedDate.ToLocalTime().ToString("dd MMM yyyy HH:mm"))
+                        </div>
+                    </div>
+
+                    @if (!string.IsNullOrWhiteSpace(Model.Reason))
+                    {
+                        <div class="col-12">
+                            <div class="text-muted small">Customer's Reason</div>
+                            <div class="border rounded p-3 bg-light">
+                                @Model.Reason
+                            </div>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(Model.VerificationMethod))
+                    {
+                        <div class="col-md-6">
+                            <div class="text-muted small">Verification Method</div>
+                            <div>
+                                @Model.VerificationMethod
+                            </div>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(Model.VerificationNotes))
+                    {
+                        <div class="col-12">
+                            <div class="text-muted small">Verification Notes</div>
+                            <div class="border rounded p-3 bg-light">
+                                @Model.VerificationNotes
+                            </div>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(Model.ReviewedBy))
+                    {
+                        <div class="col-md-6">
+                            <div class="text-muted small">Reviewed By</div>
+                            <div>
+                                @Model.ReviewedBy
+                            </div>
+                        </div>
+                    }
+
+                    @if (Model.ReviewedDate.HasValue)
+                    {
+                        <div class="col-md-6">
+                            <div class="text-muted small">Reviewed Date</div>
+                            <div>
+                                @(Model.ReviewedDate.Value.ToLocalTime().ToString("dd MMM yyyy HH:mm"))
+                            </div>
+                        </div>
+                    }
+
+                    @if (Model.CompletedDate.HasValue)
+                    {
+                        <div class="col-md-6">
+                            <div class="text-muted small">Completed Date</div>
+                            <div>
+                                @(Model.CompletedDate.Value.ToLocalTime().ToString("dd MMM yyyy HH:mm"))
+                            </div>
+                        </div>
+                    }
+
+                </div>
+            </div>
+        </div>
+
+        @if (Model.Quotations.Any())
+        {
+            <div class="card shadow-sm mt-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Recent Quotations</h5>
+                </div>
+
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0 align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Quotation</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                    <th class="text-end">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            @foreach (var quotation in Model.Quotations)
+                            {
+                                <tr>
+                                    <td>@quotation.QuotationNumber</td>
+                                    <td>
+                                        @(quotation.RequestDate.ToLocalTime().ToString("dd MMM yyyy"))
+                                    </td>
+                                    <td>@quotation.Status</td>
+                                    <td class="text-end">
+                                        @if (quotation.TotalAmount.HasValue)
+                                        {
+                                            @quotation.TotalAmount.Value.ToString("N2")
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">—</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        }
+
+        @if (Model.Orders.Any())
+        {
+            <div class="card shadow-sm mt-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Recent Orders</h5>
+                </div>
+
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0 align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Order</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                    <th class="text-end">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            @foreach (var order in Model.Orders)
+                            {
+                                <tr>
+                                    <td>@order.OrderNumber</td>
+                                    <td>
+                                        @(order.OrderDate.ToLocalTime().ToString("dd MMM yyyy"))
+                                    </td>
+                                    <td>@order.Status</td>
+                                    <td class="text-end">
+                                        @order.TotalAmount.ToString("N2")
+                                    </td>
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        }
+
+    </div>
+
+    <div class="col-lg-4">
+
+        @if (string.Equals(Model.Status, "Pending", StringComparison.OrdinalIgnoreCase))
+        {
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Review Request</h5>
+                </div>
+
+                <div class="card-body">
+
+                    <div class="alert alert-warning">
+                        <strong>Verification required.</strong>
+                        Confirm the customer's identity before approving
+                        this recovery request.
+                    </div>
+
+                    <form asp-action="Approve" method="post" class="mb-3">
+                        @Html.AntiForgeryToken()
+
+                        <input type="hidden"
+                               asp-for="AccountRecoveryRequestId" />
+
+                        <div class="mb-3">
+                            <label asp-for="NewContactCountryCode"
+                                   class="form-label">
+                                New Contact Country
+                            </label>
+
+                            <select asp-for="NewContactCountryCode"
+                                    class="form-select">
+                                <option value="">
+                                    Select country
+                                </option>
+
+                                @foreach (var country in phoneCountries)
+                                {
+                                    <option value="@country.Code">
+                                        @country.Name (+@country.CallingCode)
+                                    </option>
+                                }
+                            </select>
+
+                            <div class="form-text">
+                                Select the country for the new contact number.
+                            </div>
+
+                            <span asp-validation-for="NewContactCountryCode"
+                                  class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="NewContactPhone"
+                                   class="form-label">
+                                New Contact Phone
+                            </label>
+
+                            <input asp-for="NewContactPhone"
+                                   class="form-control"
+                                   placeholder="Enter phone number without country code"
+                                   autocomplete="tel" />
+
+                            <div class="form-text">
+                                Enter the national/local number only.
+                                The country code will be added automatically.
+                            </div>
+
+                            <span asp-validation-for="NewContactPhone"
+                                  class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="VerificationMethod"
+                                   class="form-label">
+                                Verification Method
+                            </label>
+
+                            <input asp-for="VerificationMethod"
+                                   class="form-control"
+                                   placeholder="e.g. Registered phone call" />
+
+                            <span asp-validation-for="VerificationMethod"
+                                  class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="VerificationNotes"
+                                   class="form-label">
+                                Verification Notes
+                            </label>
+
+                            <textarea asp-for="VerificationNotes"
+                                      class="form-control"
+                                      rows="4"
+                                      placeholder="Record how the customer's identity was verified."></textarea>
+
+                            <span asp-validation-for="VerificationNotes"
+                                  class="text-danger"></span>
+                        </div>
+
+                        <button type="submit"
+                                class="btn btn-success w-100">
+                            Approve Recovery
+                        </button>
+                    </form>
+
+                    <hr />
+
+                    <form asp-action="Reject" method="post">
+                        @Html.AntiForgeryToken()
+
+                        <input type="hidden"
+                               asp-for="AccountRecoveryRequestId" />
+
+                        <div class="mb-3">
+                            <label asp-for="VerificationNotes"
+                                   class="form-label">
+                                Rejection Reason
+                            </label>
+
+                            <textarea asp-for="VerificationNotes"
+                                      class="form-control"
+                                      rows="4"
+                                      placeholder="Explain why the recovery request is being rejected."></textarea>
+
+                            <span asp-validation-for="VerificationNotes"
+                                  class="text-danger"></span>
+                        </div>
+
+                        <button type="submit"
+                                class="btn btn-outline-danger w-100">
+                            Reject Recovery
+                        </button>
+                    </form>
+
+                </div>
+            </div>
+        }
+        else if (string.Equals(Model.Status, "Approved", StringComparison.OrdinalIgnoreCase))
+        {
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Recovery Approved</h5>
+                </div>
+
+                <div class="card-body">
+
+                    <div class="alert alert-success">
+                        <strong>Recovery request approved.</strong>
+                        The customer's login password has been reset successfully.
+                    </div>
+
+                    @if (ViewBag.TemporaryPassword is string temporaryPassword
+                         && !string.IsNullOrWhiteSpace(temporaryPassword))
+                    {
+                        <div class="alert alert-warning">
+                            <h6 class="alert-heading">Temporary Password</h6>
+
+                            <p class="mb-2">
+                                Give this temporary password to the customer through
+                                a secure channel. The customer will be required to
+                                change it after signing in.
+                            </p>
+
+                            <div class="input-group">
+                                <input type="text"
+                                       class="form-control font-monospace"
+                                       value="@temporaryPassword"
+                                       readonly />
+                                <button type="button"
+                                        class="btn btn-outline-secondary"
+                                        onclick="navigator.clipboard.writeText('@temporaryPassword')">
+                                    Copy
+                                </button>
+                            </div>
+                        </div>
+                    }
+
+                    <dl class="row mb-0">
+                        <dt class="col-sm-5">Reviewed By</dt>
+                        <dd class="col-sm-7">
+                            @(Model.ReviewedBy ?? "Not recorded")
+                        </dd>
+
+                        <dt class="col-sm-5">Reviewed Date</dt>
+                        <dd class="col-sm-7">
+                            @if (Model.ReviewedDate.HasValue)
+                            {
+                                @(Model.ReviewedDate.Value.ToLocalTime().ToString("dd MMM yyyy HH:mm"))
+                            }
+                            else
+                            {
+                                <span class="text-muted">Not recorded</span>
+                            }
+                        </dd>
+
+                        <dt class="col-sm-5">Verification Method</dt>
+                        <dd class="col-sm-7">
+                            @(Model.VerificationMethod ?? "Not recorded")
+                        </dd>
+
+                        <dt class="col-sm-5">Verification Notes</dt>
+                        <dd class="col-sm-7">
+                            @(Model.VerificationNotes ?? "Not recorded")
+                        </dd>
+                    </dl>
+
+                </div>
+            </div>
+        }
+        else if (string.Equals(Model.Status, "Rejected", StringComparison.OrdinalIgnoreCase))
+        {
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Recovery Rejected</h5>
+                </div>
+
+                <div class="card-body">
+
+                    <div class="alert alert-danger">
+                        This recovery request was rejected.
+                    </div>
+
+                    <dl class="row mb-0">
+                        <dt class="col-sm-5">Reviewed By</dt>
+                        <dd class="col-sm-7">
+                            @(Model.ReviewedBy ?? "Not recorded")
+                        </dd>
+
+                        <dt class="col-sm-5">Reviewed Date</dt>
+                        <dd class="col-sm-7">
+                            @if (Model.ReviewedDate.HasValue)
+                            {
+                                @(Model.ReviewedDate.Value.ToLocalTime().ToString("dd MMM yyyy HH:mm"))
+                            }
+                            else
+                            {
+                                <span class="text-muted">Not recorded</span>
+                            }
+                        </dd>
+
+                        <dt class="col-sm-5">Rejection Reason</dt>
+                        <dd class="col-sm-7">
+                            @(Model.VerificationNotes ?? "No reason recorded")
+                        </dd>
+                    </dl>
+
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Review Status</h5>
+                </div>
+
+                <div class="card-body">
+                    <p class="mb-0">
+                        This request has already been reviewed.
+                    </p>
+                </div>
+            </div>
+        }
+
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

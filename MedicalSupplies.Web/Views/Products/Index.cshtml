@@ -1,22 +1,37 @@
 @model CatalogueListViewModel
-@{ ViewData["Title"] = "Products"; }
+@using MedicalSupplies.Core.Enums
+
+@{
+    ViewData["Title"] = "Products";
+}
 
 <h1 class="mb-4">Medical Supplies &amp; Equipment</h1>
 
 <form method="get" class="row g-2 mb-4">
     <div class="col-md-5">
-        <input type="text" name="q" value="@Model.SearchTerm" class="form-control" placeholder="Search products, e.g. glucometer" />
+        <input type="text"
+               name="q"
+               value="@Model.SearchTerm"
+               class="form-control"
+               placeholder="Search products, e.g. glucometer" />
     </div>
+
     <div class="col-md-3">
-        <select name="categoryId" class="form-select" asp-items="@(Model.CategoryOptions.Select(o => new SelectListItem(o.Text, o.Value.ToString())))">
+        <select name="categoryId"
+                class="form-select"
+                asp-items="@(Model.CategoryOptions.Select(o => new SelectListItem(o.Text, o.Value.ToString())))">
             <option value="">All Categories</option>
         </select>
     </div>
+
     <div class="col-md-3">
-        <select name="brandId" class="form-select" asp-items="@(Model.BrandOptions.Select(o => new SelectListItem(o.Text, o.Value.ToString())))">
+        <select name="brandId"
+                class="form-select"
+                asp-items="@(Model.BrandOptions.Select(o => new SelectListItem(o.Text, o.Value.ToString())))">
             <option value="">All Brands</option>
         </select>
     </div>
+
     <div class="col-md-1">
         <button type="submit" class="btn btn-primary w-100">Go</button>
     </div>
@@ -28,25 +43,105 @@
     @foreach (var product in Model.Products)
     {
         <div class="col">
-            <div class="card h-100">
+            <div class="card h-100 shadow-sm position-relative">
+
+                @if (product.IsOnSale)
+                {
+                    <span class="badge bg-danger position-absolute top-0 end-0 m-2">
+                        On Sale
+                    </span>
+                }
+
+                @if (product.Availability == ProductAvailability.ComingSoon)
+                {
+                    <span class="badge bg-info text-dark position-absolute top-0 start-0 m-2">
+                        Coming Soon
+                    </span>
+                }
+
                 <a asp-action="Details" asp-route-id="@product.ProductId">
                     <img src="@(product.PrimaryImageUrl ?? "/images/placeholder-product.svg")"
-                         class="card-img-top" style="height:160px; object-fit:cover;" alt="@product.ProductName" />
+                         class="card-img-top"
+                         style="height:160px; object-fit:cover;"
+                         alt="@product.ProductName" />
                 </a>
-                <div class="card-body">
+
+                <div class="card-body d-flex flex-column">
                     <h6 class="card-title">
-                        <a asp-action="Details" asp-route-id="@product.ProductId" class="text-decoration-none text-dark">@product.ProductName</a>
+                        <a asp-action="Details"
+                           asp-route-id="@product.ProductId"
+                           class="text-decoration-none text-dark">
+                            @product.ProductName
+                        </a>
                     </h6>
-                    <p class="card-text small text-muted mb-1">@product.CategoryName @(product.BrandName is not null ? $"· {product.BrandName}" : "")</p>
-                    <p class="card-text small">@product.PackSize</p>
-                    @if (product.InStock)
+
+                    <p class="card-text small text-muted mb-1">
+                        @product.CategoryName
+                        @(product.BrandName is not null ? $" · {product.BrandName}" : "")
+                    </p>
+
+                    @if (!string.IsNullOrWhiteSpace(product.PackSize))
                     {
-                        <span class="badge bg-success">In Stock</span>
+                        <p class="card-text small mb-2">
+                            @product.PackSize
+                        </p>
                     }
-                    else
-                    {
-                        <span class="badge bg-secondary">Check Availability</span>
-                    }
+
+                    <div class="mb-2">
+                        @switch (product.Availability)
+                        {
+                            case ProductAvailability.InStock:
+                                <span class="badge bg-success">In Stock</span>
+                                break;
+
+                            case ProductAvailability.AvailableOnRequest:
+                                <span class="badge bg-primary">Available on Request</span>
+                                break;
+
+                            case ProductAvailability.QuotationRequired:
+                                <span class="badge bg-warning text-dark">Quotation Required</span>
+                                break;
+
+                            case ProductAvailability.OutOfStock:
+                                <span class="badge bg-secondary">Out of Stock</span>
+                                break;
+
+                            case ProductAvailability.ComingSoon:
+                                <span class="badge bg-info text-dark">Coming Soon</span>
+                                break;
+                        }
+                    </div>
+
+                    <div class="mt-auto">
+                        <div class="d-grid gap-2">
+                            <form asp-controller="Quotation"
+                                  asp-action="Add"
+                                  method="post">
+                                <input type="hidden"
+                                       name="productId"
+                                       value="@product.ProductId" />
+
+                                <input type="hidden"
+                                       name="quantity"
+                                       value="1" />
+
+                                <input type="hidden"
+                                       name="returnUrl"
+                                       value="@Context.Request.Path@Context.Request.QueryString" />
+
+                                <button type="submit"
+                                        class="btn btn-primary btn-sm w-100">
+                                    Request a Quote
+                                </button>
+                            </form>
+
+                            <a asp-action="Details"
+                               asp-route-id="@product.ProductId"
+                               class="btn btn-outline-primary btn-sm w-100">
+                                View Product
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -55,5 +150,10 @@
 
 @if (!Model.Products.Any())
 {
-    <p class="text-muted mt-4">No products matched your search. Try a different term, or <a asp-controller="Home" asp-action="Index">contact us</a> with your requirements.</p>
+    <p class="text-muted mt-4">
+        No products matched your search.
+        Try a different term, or
+        <a asp-controller="Home" asp-action="Index">contact us</a>
+        with your requirements.
+    </p>
 }

@@ -5,6 +5,8 @@ using MedicalSupplies.Web.ViewModels.Admin;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using MedicalSupplies.Infrastructure.Identity;
 
 namespace MedicalSupplies.Web.Areas.Admin.Controllers;
 
@@ -13,8 +15,26 @@ namespace MedicalSupplies.Web.Areas.Admin.Controllers;
 public class InventoryBatchesController : Controller
 {
     private readonly ApplicationDbContext _context;
+    private readonly UserManager<ApplicationUser> _userManager;
 
-    public InventoryBatchesController(ApplicationDbContext context) => _context = context;
+    public InventoryBatchesController(
+        ApplicationDbContext context,
+        UserManager<ApplicationUser> userManager)
+    {
+        _context = context;
+        _userManager = userManager;
+    }
+
+    private async Task<string?> GetCurrentUserDisplayNameAsync()
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user is null)
+            return User.Identity?.Name;
+
+        return string.IsNullOrWhiteSpace(user.FullName)
+            ? user.UserName
+            : user.FullName;
+    }
 
     public async Task<IActionResult> Index(int? productId)
     {
@@ -59,6 +79,45 @@ public class InventoryBatchesController : Controller
             return View(vm);
         }
 
+        var today = DateOnly.FromDateTime(DateTime.UtcNow.AddHours(3));
+
+        if (vm.ManufacturingDate.HasValue && vm.ManufacturingDate.Value > today)
+        {
+            ModelState.AddModelError(
+                nameof(vm.ManufacturingDate),
+                $"Manufacturing date cannot be later than today ({today:dd MMM yyyy}).");
+
+            vm.ProductOptions = await GetProductOptionsAsync();
+            vm.SupplierOptions = await GetSupplierOptionsAsync();
+            return View(vm);
+        }
+
+        if (vm.ExpiryDate.HasValue && vm.ExpiryDate.Value < today)
+        {
+            ModelState.AddModelError(
+                nameof(vm.ExpiryDate),
+                $"Expiry date cannot be earlier than today ({today:dd MMM yyyy}).");
+
+            vm.ProductOptions = await GetProductOptionsAsync();
+            vm.SupplierOptions = await GetSupplierOptionsAsync();
+            return View(vm);
+        }
+
+        if (vm.ManufacturingDate.HasValue &&
+            vm.ExpiryDate.HasValue &&
+            vm.ExpiryDate.Value < vm.ManufacturingDate.Value)
+        {
+            ModelState.AddModelError(
+                nameof(vm.ExpiryDate),
+                "Expiry date cannot be earlier than the manufacturing date.");
+
+            vm.ProductOptions = await GetProductOptionsAsync();
+            vm.SupplierOptions = await GetSupplierOptionsAsync();
+            return View(vm);
+        }
+
+        var changedBy = await GetCurrentUserDisplayNameAsync();
+
         var batch = new InventoryBatch
         {
             ProductId = vm.ProductId,
@@ -79,7 +138,8 @@ public class InventoryBatchesController : Controller
             Batch = batch,
             MovementType = StockMovementType.Purchase,
             QuantityChange = vm.QuantityReceived,
-            Notes = "Batch received into stock."
+            Notes = "Batch received into stock.",
+            CreatedBy = changedBy
         });
 
         await _context.SaveChangesAsync();

@@ -1,0 +1,289 @@
+@model MedicalSupplies.Web.ViewModels.Admin.Customers.CustomerDetailsViewModel
+@using MedicalSupplies.Core.Security
+@using Microsoft.AspNetCore.Authorization
+@inject IAuthorizationService AuthorizationService
+
+@{
+    ViewData["Title"] = "Customer Details";
+
+    var canDeleteCustomer = (await AuthorizationService.AuthorizeAsync(
+        User,
+        Permissions.Customers.Delete)).Succeeded;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="mb-1">Customer Details</h1>
+        <p class="text-muted mb-0">
+            Customer #@Model.CustomerId
+        </p>
+    </div>
+
+    <div class="d-flex gap-2">
+        <a asp-action="Edit"
+           asp-route-id="@Model.CustomerId"
+           class="btn btn-primary">
+            Edit Customer
+        </a>
+
+        @if (canDeleteCustomer)
+        {
+            <form asp-action="Delete"
+                  asp-route-id="@Model.CustomerId"
+                  method="post"
+                  class="d-inline"
+                  onsubmit="return confirm('Are you sure you want to permanently delete this customer? This cannot be undone.');">
+                @Html.AntiForgeryToken()
+                <button type="submit"
+                        class="btn btn-danger">
+                    Delete Customer
+                </button>
+            </form>
+        }
+
+        <a asp-action="Index"
+           class="btn btn-outline-secondary">
+            Back to Customers
+        </a>
+    </div>
+</div>
+
+@if (TempData["Success"] is string success)
+{
+    <div class="alert alert-success">@success</div>
+}
+
+@if (TempData["Error"] is string error)
+{
+    <div class="alert alert-danger">@error</div>
+}
+
+<div class="row g-4">
+
+    <div class="col-lg-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-header">
+                <strong>Account & Contact</strong>
+            </div>
+
+            <div class="card-body">
+                <dl class="row mb-0">
+
+                    <dt class="col-sm-5">Organization / Account</dt>
+                    <dd class="col-sm-7">
+                        @if (!string.IsNullOrWhiteSpace(Model.OrganizationName))
+                        {
+                            @Model.OrganizationName
+                        }
+                        else
+                        {
+                            <span class="text-muted">Individual</span>
+                        }
+                    </dd>
+
+                    <dt class="col-sm-5">Contact Person</dt>
+                    <dd class="col-sm-7">
+                        @(string.IsNullOrWhiteSpace(Model.CustomerName)
+                            ? "—"
+                            : Model.CustomerName)
+                    </dd>
+
+                    <dt class="col-sm-5">Email</dt>
+                    <dd class="col-sm-7">
+                        @if (!string.IsNullOrWhiteSpace(Model.Email))
+                        {
+                            @Model.Email
+                        }
+                        else
+                        {
+                            <span class="text-muted">—</span>
+                        }
+                    </dd>
+
+                    <dt class="col-sm-5">Phone</dt>
+                    <dd class="col-sm-7">
+                        @if (!string.IsNullOrWhiteSpace(Model.Phone))
+                        {
+                            @Model.Phone
+                        }
+                        else
+                        {
+                            <span class="text-muted">—</span>
+                        }
+                    </dd>
+
+                    <dt class="col-sm-5">Address</dt>
+                    <dd class="col-sm-7">
+                        @if (!string.IsNullOrWhiteSpace(Model.Address))
+                        {
+                            @Model.Address
+                        }
+                        else
+                        {
+                            <span class="text-muted">—</span>
+                        }
+                    </dd>
+
+                    <dt class="col-sm-5">City</dt>
+                    <dd class="col-sm-7">
+                        @if (!string.IsNullOrWhiteSpace(Model.City))
+                        {
+                            @Model.City
+                        }
+                        else
+                        {
+                            <span class="text-muted">—</span>
+                        }
+                    </dd>
+
+                    <dt class="col-sm-5">Customer Type</dt>
+                    <dd class="col-sm-7">@Model.CustomerType</dd>
+
+                    <dt class="col-sm-5">Status</dt>
+                    <dd class="col-sm-7">
+                        @if (Model.IsActive)
+                        {
+                            <span class="badge bg-success">Active</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">Inactive</span>
+                        }
+                    </dd>
+
+                    <dt class="col-sm-5">Login Account</dt>
+                    <dd class="col-sm-7">
+                        @if (Model.HasLogin)
+                        {
+                            <span class="badge bg-success">Registered</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">No login</span>
+                        }
+                    </dd>
+
+                </dl>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-header">
+                <strong>Quotation History</strong>
+            </div>
+
+            <div class="card-body p-0">
+                @if (Model.Quotations.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Quotation</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                    <th class="text-end">Total</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                            @foreach (var quotation in Model.Quotations)
+                            {
+                                <tr>
+                                    <td>
+                                        <a asp-area="Admin"
+                                           asp-controller="Quotations"
+                                           asp-action="Details"
+                                           asp-route-id="@quotation.QuotationId">
+                                            @quotation.QuotationNumber
+                                        </a>
+                                    </td>
+
+                                    <td>
+                                        @quotation.RequestDate.ToLocalTime().ToString("dd MMM yyyy")
+                                    </td>
+
+                                    <td>@quotation.Status</td>
+
+                                    <td class="text-end">
+                                        @(quotation.TotalAmount.HasValue
+                                            ? $"UGX {quotation.TotalAmount.Value:N0}"
+                                            : "—")
+                                    </td>
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="p-3 text-muted">
+                        No quotations found for this customer.
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <strong>Order History</strong>
+            </div>
+
+            <div class="card-body p-0">
+                @if (Model.Orders.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Order</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                    <th class="text-end">Total</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                            @foreach (var order in Model.Orders)
+                            {
+                                <tr>
+                                    <td>
+                                        <a asp-area="Admin"
+                                           asp-controller="Orders"
+                                           asp-action="Details"
+                                           asp-route-id="@order.OrderId">
+                                            @order.OrderNumber
+                                        </a>
+                                    </td>
+
+                                    <td>
+                                        @order.OrderDate.ToLocalTime().ToString("dd MMM yyyy")
+                                    </td>
+
+                                    <td>@order.Status</td>
+
+                                    <td class="text-end">
+                                        UGX @order.TotalAmount.ToString("N0")
+                                    </td>
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="p-3 text-muted">
+                        No orders found for this customer.
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+</div>
